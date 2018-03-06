@@ -4,8 +4,8 @@
 <mapper namespace="org.seckill.dao.SuccessKilledDao">
     <insert id="insertSuccessKilled">
         <!--主键冲突的时候，忽略-->
-        INSERT IGNORE INTO success_killed (seckill_id, user_phone)
-        VALUES (#{seckillId}, #{userPhone})
+        INSERT IGNORE INTO success_killed (seckill_id, user_phone, state)
+        VALUES (#{seckillId}, #{userPhone}, 0)
     </insert>
 
     <select id="queryByIdWithSeckill" resultType="SuccessKilled">
@@ -24,5 +24,6 @@
         FROM success_killed sk
         INNER JOIN seckill s ON sk.seckill_id = s.seckill_id
         WHERE sk.seckill_id = #{seckillId}
+        AND sk.user_phone = #{userPhone}
     </select>
 </mapper>

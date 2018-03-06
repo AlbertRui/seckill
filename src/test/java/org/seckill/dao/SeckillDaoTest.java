@@ -7,6 +7,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 配置spring和Junit整合，Junit启动时动态加载spring IOC容器
@@ -21,16 +23,22 @@ public class SeckillDaoTest {
 
     @Test
     public void reduceNumber() {
+        int updateCount = seckillDao.reduceNumber(1000L, new Date());
+        System.out.println(updateCount);
+    }
+
+    @Test
+    public void queryById() {
         Seckill seckill = seckillDao.queryById(1000);
         System.out.println(seckill.getName());
         System.out.println(seckill);
     }
 
     @Test
-    public void queryById() {
-    }
-
-    @Test
     public void queryAll() {
+        List<Seckill> seckills = seckillDao.queryAll(0, 100);
+        for (Seckill seckill:seckills) {
+            System.out.println(seckill);
+        }
     }
 }
