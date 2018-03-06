@@ -1,12 +1,10 @@
 package org.seckill.exception;
 
 /**
- * 秒杀关闭异常
- *
  * @author AlbertRui
- * @date 2018-03-06 21:21
+ * @date 2018-03-06 21:26
  */
-public class SeckillCloseException extends RuntimeException {
+public class SeckillException extends RuntimeException {
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
@@ -15,7 +13,7 @@ public class SeckillCloseException extends RuntimeException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public SeckillCloseException(String message) {
+    public SeckillException(String message) {
         super(message);
     }
 
@@ -33,7 +31,7 @@ public class SeckillCloseException extends RuntimeException {
      *                unknown.)
      * @since 1.4
      */
-    public SeckillCloseException(String message, Throwable cause) {
+    public SeckillException(String message, Throwable cause) {
         super(message, cause);
     }
 }

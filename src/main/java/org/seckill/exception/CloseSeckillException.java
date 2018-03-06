@@ -1,12 +1,12 @@
 package org.seckill.exception;
 
 /**
- * 重复秒杀异常
+ * 秒杀关闭异常
  *
  * @author AlbertRui
- * @date 2018-03-06 21:17
+ * @date 2018-03-06 21:21
  */
-public class RepeatSeckillException extends SeckillException {
+public class CloseSeckillException extends SeckillException {
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
@@ -15,7 +15,7 @@ public class RepeatSeckillException extends SeckillException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public RepeatSeckillException(String message) {
+    public CloseSeckillException(String message) {
         super(message);
     }
 
@@ -33,7 +33,7 @@ public class RepeatSeckillException extends SeckillException {
      *                unknown.)
      * @since 1.4
      */
-    public RepeatSeckillException(String message, Throwable cause) {
+    public CloseSeckillException(String message, Throwable cause) {
         super(message, cause);
     }
 }
