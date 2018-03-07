@@ -13,6 +13,8 @@ import org.seckill.exception.SeckillException;
 import org.seckill.service.SeckillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.util.Date;
@@ -22,16 +24,24 @@ import java.util.List;
  * @author AlbertRui
  * @date 2018-03-06 21:35
  */
+@Service
 public class SeckillServiceImpl implements SeckillService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private SeckillDao seckillDao;
 
-    private SuccessKilledDao successKilledDao;
+    private final SuccessKilledDao successKilledDao;
 
     //MD5盐值字符串，用于混淆md5
     private final String slat = "#$%$@fjkal;fjad;fdjfdas$";
+    private final SeckillDao seckillDao;
+
+    //注入service依赖
+    @Autowired
+    public SeckillServiceImpl(SeckillDao seckillDao, SuccessKilledDao successKilledDao) {
+        this.seckillDao = seckillDao;
+        this.successKilledDao = successKilledDao;
+    }
 
     /**
      * 查询所有秒杀记录
