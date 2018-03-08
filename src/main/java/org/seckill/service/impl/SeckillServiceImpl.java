@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import java.util.Date;
@@ -24,24 +25,22 @@ import java.util.List;
  * @author AlbertRui
  * @date 2018-03-06 21:35
  */
+@SuppressWarnings("ALL")
 @Service
 public class SeckillServiceImpl implements SeckillService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-    private final SuccessKilledDao successKilledDao;
-
     //MD5盐值字符串，用于混淆md5
+    @Autowired
+    private SeckillDao seckillDao;
+
+    @Autowired
+    private SuccessKilledDao successKilledDao;
+
     private final String slat = "#$%$@fjkal;fjad;fdjfdas$";
-    private final SeckillDao seckillDao;
 
     //注入service依赖
-    @Autowired
-    public SeckillServiceImpl(SeckillDao seckillDao, SuccessKilledDao successKilledDao) {
-        this.seckillDao = seckillDao;
-        this.successKilledDao = successKilledDao;
-    }
 
     /**
      * 查询所有秒杀记录
@@ -94,6 +93,10 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 执行秒杀操作
+     * 使用注解控制事物方法的优点：
+     * 1.开发团队达成一致约定，明确标注事物方法的编程风格
+     * 2.保证事物方法执行时间尽可能短，不要穿插其他网络操作RPC/HTTP请求，或者剥离事物方法外部
+     * 3.不是所有的方法都需要事物，如只有一条修改操作，制度操作不需要事物控制
      *
      * @param seckillId
      * @param userPhone
@@ -101,8 +104,9 @@ public class SeckillServiceImpl implements SeckillService {
      * @return
      */
     @Override
+    @Transactional
     public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatSeckillException, CloseSeckillException {
-        if (md5 == null || md5.equals(getMD5(seckillId))) {
+        if (md5 == null || !md5.equals(getMD5(seckillId))) {
             throw new SeckillException("seckill data rewrite");
         }
 
