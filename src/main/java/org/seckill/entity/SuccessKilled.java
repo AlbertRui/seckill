@@ -9,9 +9,9 @@ import java.util.Date;
 @SuppressWarnings("ALL")
 public class SuccessKilled {
 
-    private long seckillId;
+    private Long seckillId;
 
-    private long userPhone;
+    private Long userPhone;
 
     private short state;
 
@@ -19,19 +19,19 @@ public class SuccessKilled {
 
     private Seckill seckill;
 
-    public long getSeckillId() {
+    public Long getSeckillId() {
         return seckillId;
     }
 
-    public void setSeckillId(long seckillId) {
+    public void setSeckillId(Long seckillId) {
         this.seckillId = seckillId;
     }
 
-    public long getUserPhone() {
+    public Long getUserPhone() {
         return userPhone;
     }
 
-    public void setUserPhone(long userPhone) {
+    public void setUserPhone(Long userPhone) {
         this.userPhone = userPhone;
     }
 

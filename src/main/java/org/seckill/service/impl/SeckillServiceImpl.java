@@ -59,7 +59,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @return
      */
     @Override
-    public Seckill getSeckillById(long seckillId) {
+    public Seckill getSeckillById(Long seckillId) {
         return seckillDao.queryById(seckillId);
     }
 
@@ -71,7 +71,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @return
      */
     @Override
-    public Exposer exportSeckillUrl(long seckillId) {
+    public Exposer exportSeckillUrl(Long seckillId) {
         Seckill seckill = seckillDao.queryById(seckillId);
         if (seckill == null) {
             return new Exposer(false, seckillId);
@@ -105,7 +105,7 @@ public class SeckillServiceImpl implements SeckillService {
      */
     @Override
     @Transactional
-    public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatSeckillException, CloseSeckillException {
+    public SeckillExecution executeSeckill(Long seckillId, Long userPhone, String md5) throws SeckillException, RepeatSeckillException, CloseSeckillException {
         if (md5 == null || !md5.equals(getMD5(seckillId))) {
             throw new SeckillException("seckill data rewrite");
         }
@@ -140,7 +140,7 @@ public class SeckillServiceImpl implements SeckillService {
         }
     }
 
-    private String getMD5(long seckillId) {
+    private String getMD5(Long seckillId) {
         String base = seckillId + "/" + slat;
         return DigestUtils.md5DigestAsHex(base.getBytes());
     }

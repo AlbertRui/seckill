@@ -12,27 +12,27 @@ public class Exposer {
     private boolean exposed;
 
     //秒杀id
-    private long seckillId;
+    private Long seckillId;
 
     //使用md5加密
     private String md5;
 
     //系统当前时间（毫秒）
-    private long now;
+    private Long now;
 
     //秒杀开启时间
-    private long start;
+    private Long start;
 
     //秒杀结束时间
-    private long end;
+    private Long end;
 
-    public Exposer(boolean exposed, long seckillId, String md5) {
+    public Exposer(boolean exposed, Long seckillId, String md5) {
         this.exposed = exposed;
         this.seckillId = seckillId;
         this.md5 = md5;
     }
 
-    public Exposer(boolean exposed, long seckillId, long now, long start, long end) {
+    public Exposer(boolean exposed, Long seckillId, Long now, Long start, Long end) {
         this.exposed = exposed;
         this.seckillId = seckillId;
         this.now = now;
@@ -40,7 +40,7 @@ public class Exposer {
         this.end = end;
     }
 
-    public Exposer(boolean exposed, long seckillId) {
+    public Exposer(boolean exposed, Long seckillId) {
         this.exposed = exposed;
         this.seckillId = seckillId;
     }
@@ -53,11 +53,11 @@ public class Exposer {
         this.exposed = exposed;
     }
 
-    public long getSeckillId() {
+    public Long getSeckillId() {
         return seckillId;
     }
 
-    public void setSeckillId(long seckillId) {
+    public void setSeckillId(Long seckillId) {
         this.seckillId = seckillId;
     }
 
@@ -69,27 +69,27 @@ public class Exposer {
         this.md5 = md5;
     }
 
-    public long getNow() {
+    public Long getNow() {
         return now;
     }
 
-    public void setNow(long now) {
+    public void setNow(Long now) {
         this.now = now;
     }
 
-    public long getStart() {
+    public Long getStart() {
         return start;
     }
 
-    public void setStart(long start) {
+    public void setStart(Long start) {
         this.start = start;
     }
 
-    public long getEnd() {
+    public Long getEnd() {
         return end;
     }
 
-    public void setEnd(long end) {
+    public void setEnd(Long end) {
         this.end = end;
     }
 

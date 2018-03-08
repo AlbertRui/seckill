@@ -29,7 +29,7 @@ public class SeckillDaoTest {
 
     @Test
     public void queryById() {
-        Seckill seckill = seckillDao.queryById(1000);
+        Seckill seckill = seckillDao.queryById(1000L);
         System.out.println(seckill.getName());
         System.out.println(seckill);
     }

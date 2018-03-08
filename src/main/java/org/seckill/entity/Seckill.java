@@ -9,7 +9,7 @@ import java.util.Date;
 @SuppressWarnings("ALL")
 public class Seckill {
 
-    private long seckillId;
+    private Long seckillId;
 
     private String name;
 
@@ -21,11 +21,11 @@ public class Seckill {
 
     private Date createTime;
 
-    public long getSeckillId() {
+    public Long getSeckillId() {
         return seckillId;
     }
 
-    public void setSeckillId(long seckillId) {
+    public void setSeckillId(Long seckillId) {
         this.seckillId = seckillId;
     }
 

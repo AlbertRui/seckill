@@ -31,7 +31,7 @@ public interface SeckillService {
      * @param seckillId
      * @return
      */
-    Seckill getSeckillById(long seckillId);
+    Seckill getSeckillById(Long seckillId);
 
     /**
      * 秒杀开启时，输出秒杀接口地址
@@ -40,7 +40,7 @@ public interface SeckillService {
      * @param seckillId
      * @return
      */
-    Exposer exportSeckillUrl(long seckillId);
+    Exposer exportSeckillUrl(Long seckillId);
 
     /**
      * 执行秒杀操作
@@ -50,5 +50,5 @@ public interface SeckillService {
      * @param md5
      * @return
      */
-    SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatSeckillException, CloseSeckillException;
+    SeckillExecution executeSeckill(Long seckillId, Long userPhone, String md5) throws SeckillException, RepeatSeckillException, CloseSeckillException;
 }

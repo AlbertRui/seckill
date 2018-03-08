@@ -17,13 +17,13 @@ public class SuccessKilledDaoTest {
 
     @Test
     public void insertSuccessKilled() {
-        int inseertCount = successKilledDao.insertSuccessKilled(1000, 15790437832L);
+        int inseertCount = successKilledDao.insertSuccessKilled(1000L, 15790437832L);
         System.out.println(inseertCount);
     }
 
     @Test
     public void queryByIdWithSeckill() {
-        SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(1000, 15790437832L);
+        SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(1000L, 15790437832L);
         System.out.println(successKilled.getSeckill());
         System.out.println(successKilled.getState());
         System.out.println(successKilled);

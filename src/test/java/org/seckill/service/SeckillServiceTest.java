@@ -31,7 +31,7 @@ public class SeckillServiceTest {
 
     @Test
     public void getSeckillById() {
-        Seckill seckill = seckillService.getSeckillById(1000);
+        Seckill seckill = seckillService.getSeckillById(1000L);
         logger.info("seckill={}", seckill);
     }
 
@@ -41,11 +41,11 @@ public class SeckillServiceTest {
      */
     @Test
     public void testSeckillLogic() {
-        Exposer exposer = seckillService.exportSeckillUrl(1000);
+        Exposer exposer = seckillService.exportSeckillUrl(1000L);
         if (exposer.isExposed()) {
             logger.info("exposer={}", exposer);
             try {
-                SeckillExecution execution = seckillService.executeSeckill(1000, 15790437832L, exposer.getMd5());
+                SeckillExecution execution = seckillService.executeSeckill(1000L, 15790437832L, exposer.getMd5());
                 logger.info("execution={}", execution);
             } catch (SeckillException ignore) {
             }
@@ -58,7 +58,7 @@ public class SeckillServiceTest {
     @Test
     public void executeSeckill() {
         try {
-            SeckillExecution execution = seckillService.executeSeckill(1000, 15790437832L, "1984e2360eed75048c89adf8cf82d5f8");
+            SeckillExecution execution = seckillService.executeSeckill(1000L, 15790437832L, "1984e2360eed75048c89adf8cf82d5f8");
             logger.info("execution={}", execution);
         } catch (SeckillException ignore) {
         }

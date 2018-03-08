@@ -13,7 +13,7 @@ import org.seckill.enums.SeckillStateEnum;
 public class SeckillExecution {
 
     //秒杀id
-    private long seckillId;
+    private Long seckillId;
 
     //秒杀执行结果状态
     private int state;
@@ -32,7 +32,7 @@ public class SeckillExecution {
      * @param stateInfo
      * @param successKilled
      */
-    public SeckillExecution(long seckillId, SeckillStateEnum stateEnum, SuccessKilled successKilled) {
+    public SeckillExecution(Long seckillId, SeckillStateEnum stateEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
         this.state = stateEnum.getState();
         this.stateInfo = stateEnum.getStateInfo();
@@ -46,17 +46,17 @@ public class SeckillExecution {
      * @param state
      * @param stateInfo
      */
-    public SeckillExecution(long seckillId, SeckillStateEnum stateEnum) {
+    public SeckillExecution(Long seckillId, SeckillStateEnum stateEnum) {
         this.seckillId = seckillId;
         this.state = stateEnum.getState();
         this.stateInfo = stateEnum.getStateInfo();
     }
 
-    public long getSeckillId() {
+    public Long getSeckillId() {
         return seckillId;
     }
 
-    public void setSeckillId(long seckillId) {
+    public void setSeckillId(Long seckillId) {
         this.seckillId = seckillId;
     }
 
