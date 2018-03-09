@@ -51,7 +51,7 @@
 
             <div class="modal-footer">
                 <%--验证信息--%>
-                <span id="killPhoneMessage" class="glyphicon"> </span>
+                <span id="killPhoneMessage" class="glyphicon"></span>
                 <button type="button" id="killPhoneBtn" class="btn btn-success">
                     <span class="glyphicon glyphicon-phone"></span>Submit
                 </button>
