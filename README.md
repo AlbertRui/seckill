@@ -1,24 +1,102 @@
-# seckill
+# SSM实战项目——Java高并发秒杀API
 一个整合SSM框架的高并发和商品秒杀项目,学习目前较流行的Java框架组合实现高并发秒杀API
 
-## 项目的来源
-项目的来源于国内IT公开课平台[慕课网](http://www.imooc.com),慕课网上资源有质量没的说,很适合学习一些技术的基础,这个项目是由四个系列的课程组成的,流程分为几个流程,很基础地教你接触到一个相对有技术含量的项目
- - Java高并发秒杀API之业务分析与DAO层
- - Java高并发秒杀API之web层
- - Java高并发秒杀API之Service层
- - Java高并发秒杀API之高并发优化
+本文包括了项目的完整流程+开发过程中遇到的各种坑的总结+学习笔记和问题扩展
+## 项目介绍
+>何为秒杀？
 
-其实这几个流程也就是开发的流程,首先从DAO层开始开发,从后往前开发,开始Coding吧！
+所谓“秒杀”，就是网络卖家发布一些超低价格的商品，所有买家在同一时间网上抢购的一种销售方式。由于商品价格低廉，往往一上架就被抢购一空，有时只用一秒钟。
 
-## 项目环境的搭建
-* **操作系统** : Ubuntu 17.04 
-* **IDE** ：IntelliJ IDEA 2016.2.5 x64 用Eclipse也一样的,工具时靠人用的
+>为何选择Java高并发秒杀作为实战项目？
+
+* 秒杀业务场景具有典型事务特性
+* 秒杀/红包类需求越来越常见
+
+>为何使用SpringMVC+Spring+MyBatis框架
+
+* 框架易于使用和轻量级
+* 低代码侵入性
+* 成熟的社区和用户群
+
+>能从该项目得到什么收获？
+
+* 框架的使用和整合技巧
+* 秒杀分析过程与优化思路
+
+>项目来源
+
+这是慕课网上的一个免费项目教学视频，名为Java高并发秒杀API，一共有如下四节课程，附带视频传送门（在视频中老师是用IDEA，本文用的是Eclipse）
+
+* [Java高并发秒杀API之业务分析与DAO层](http://www.imooc.com/learn/587)
+* [Java高并发秒杀API之Service层](http://www.imooc.com/learn/631)
+* [Java高并发秒杀API之Web层](http://www.imooc.com/learn/630)
+* [Java高并发秒杀API之高并发优化](http://www.imooc.com/learn/632)
+
+## 相关技术介绍
+
+>MySQL
+
+* 表设计
+* SQL技巧
+* 事务和行级锁
+
+>MyBatis
+
+* DAO层设计与开发
+* MyBatis合理使用
+* 与Spring整合
+
+>Spring
+
+* Spring IOC整合Service
+* 声明式事务运用
+
+>SpringMVC
+
+* Restful借口设计和使用
+* 框架运作流程
+* Controller开发技巧
+
+>前端
+
+* 交互设计
+* Bootstrap
+* jQuery
+* Ajax
+
+>高并发
+
+* 高并发点和高并发分析
+* 优化思路并实现
+
+## 开发环境
+
+* **操作系统**：Windows 7
+* **IDE** ：IntelliJ IDEA 2017.3.4 x64 用Eclipse也一样的,工具时靠人用的
 * **JDK** : JDK1.8 建议使用JDK1.7以上版本,有许多语法糖用着挺舒服的
-* **Web容器** ： Tomcat 8.0 
-* **数据库** ：Mysql-5.6.17-WinX64    实验性的项目用Mysql就足够啦
-* **依赖管理工具** : Maven  管理jar包真的很方便  
+* **中间件**：Tomcat 8.5
+* **数据库** ：Mysql-5.7-WinX64 实验性的项目用Mysql就足够啦
+* **框架**：SpringMVC + Spring + MyBatis
+* **构建工具** : Maven  管理jar包真的很方便  
 
   这里列出的环境不是必须的,你喜欢用什么就用什么,这里只是给出参考,不过不同的版本可能会引起各种不同的问题就需要我们自己去发现以及排查,在这里使用Maven的话时方便我们管理JAR包,我们不用跑去各种开源框架的官网去下载一个又一个的JAR包,配置好了Maven后添加pom文件坐标就会从中央仓库下载JAR包,如果哪天替换版本也很方便
+
+## 项目总结
+
+>本文根据慕课网的视频教学进行了相应的学习总结，全文较长，分为四节，附带CSDN传送门
+
+* Java高并发秒杀API(一)之业务分析与DAO层
+* Java高并发秒杀API(二)之Service层
+* Java高并发秒杀API(三)之Web层
+* Java高并发秒杀API(四)之高并发优化
+
+其实这几个流程也就是开发的流程,首先从DAO层开始开发,从后往前开发,开始Coding吧！
+## 项目源码
+
+* [**GitHub地址**](https://github.com/albertrui/Seckill)
+
+---
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>---
 ---
 ## 项目效果图
  - 秒杀商品列表  
@@ -47,15 +125,15 @@
 
 `Download Zip`或者 `git clone`
 ``` shell
-	git clone https://github.com/Sunybyjava/seckill.git
+git clone https://github.com/albertrui/seckill.git
 ```
 ### 导入到IDE  
 这里因为是使用`IDEA`创建的项目,所以使用`IDEA`直接打开是很方便的,提前是你要配置好`maven`的相关配置,以及项目`JDK`版本,
 `JDK`版本必须在`1.8`以上,因为在项目中使用了`Java8`的`LocalDateTime`以及`LocalDate`,所以低于这个版本编译会失败的
   - IDEA  
   直接在主界面选择`Open`,然后找到项目所在路径,点击导入就可以了
-  - Eclipse
-  这个项目是基于`IDEA`创建,我这里把项目转成了`Eclipse`的项目,如果你使用Eclipse的话也可以直接导入,只是步骤更繁琐一点,[Eclipse导入步骤](/note/EclipseImport.md)
+  - Eclipse    
+  这个项目是基于`IDEA`创建,可以把把项目转成`Eclipse`的项目,如果你使用Eclipse的话也可以直接导入,只是步骤更繁琐一点,[Eclipse导入步骤](/note/EclipseImport.md)
   
   
 ## 项目编码 
@@ -88,7 +166,8 @@ mvn archetype:generate -DgroupId=com.suny.seckill -DartifactId=seckill -Dpackage
   
 #### 构建pom文件
   
-  项目基本的骨架我们就创建出来了,接下来我们要添加一些基本的JAR包的依赖,也就是在`pom.xml`中添加各种开源组件的三坐标了    
+  项目基本的骨架我们就创建出来了,接下来我们要添加一些基本的JAR包的依赖,也就是在`pom.xml`中添加各种开源组件的三坐标了
+  [效果图](/pom.xml)    
   
   ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
