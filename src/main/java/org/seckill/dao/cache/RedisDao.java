@@ -13,6 +13,7 @@ import redis.clients.jedis.JedisPool;
  * @author AlbertRui
  * @date 2018-03-09 22:33
  */
+@SuppressWarnings("JavaDoc")
 public class RedisDao {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -33,8 +34,7 @@ public class RedisDao {
      */
     public Seckill getSeckill(Long seckillId) {
         try {
-            Jedis jedis = jedisPool.getResource();
-            try {
+            try (Jedis jedis = jedisPool.getResource()) {
                 String key = "seckill:" + seckillId;
                 //并没有实现内部序列化操作
                 //get->byte[]->反序列化：Object(seckill)
@@ -48,8 +48,6 @@ public class RedisDao {
                     //seckill被反序列化
                     return seckill;
                 }
-            } finally {
-                jedis.close();
             }
         } catch (Exception e) {
             logger.info(e.getMessage(), e);
@@ -65,14 +63,11 @@ public class RedisDao {
      */
     public String putSeckill(Seckill seckill) {
         try {
-            Jedis jedis = jedisPool.getResource();
-            try {
+            try (Jedis jedis = jedisPool.getResource()) {
                 String key = "seckill:" + seckill.getSeckillId();
                 LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
                 byte[] bytes = ProtostuffIOUtil.toByteArray(seckill, schema, buffer);
                 return jedis.setex(key.getBytes(), 3600, bytes);
-            } finally {
-                jedis.close();
             }
         } catch (Exception e) {
             logger.info(e.getMessage(), e);
