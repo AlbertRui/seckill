@@ -63,4 +63,14 @@ public class SeckillServiceTest {
         } catch (SeckillException ignore) {
         }
     }
+
+    @Test
+    public void executeSeckillProcedure() {
+        Exposer exposer = seckillService.exportSeckillUrl(1001L);
+        if (exposer != null && exposer.isExposed()) {
+            SeckillExecution execution = seckillService.executeSeckill(1001L, 12378549099L, exposer.getMd5());
+            logger.info(execution.getStateInfo());
+        }
+    }
+
 }

@@ -104,7 +104,9 @@ public class SeckillController {
         SeckillResult<SeckillExecution> result;
         SeckillExecution execution;
         try {
-            execution = seckillService.executeSeckill(seckillId, phone, md5);
+            //execution = seckillService.executeSeckill(seckillId, phone, md5);
+            //通过存储过程去执行
+            execution = seckillService.executeSeckillProdedure(seckillId, phone, md5);
             return new SeckillResult<>(true, execution);
         } catch (RepeatSeckillException e) {
             execution = new SeckillExecution(seckillId, SeckillStateEnum.REPEAT_kill);
