@@ -2,7 +2,7 @@
 ### 下载项目
 `Download Zip`或者 `git clone`
 ``` shell
-	git clone https://github.com/Sunybyjava/seckill.git
+	git clone https://github.com/albertrui/seckill.git
 ```
 ### 在Eclipse中导入项目
   -  点击菜单栏上的`File`>`Import`,选择`Existing Projects into Workspace`  
