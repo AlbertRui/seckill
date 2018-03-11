@@ -203,7 +203,7 @@ pom.xml文件中有一些依赖是可以省略不写的，因为有些包会自�
 
 >秒杀业务的核心是对库存的处理，其业务流程如下图
 
- ![1.png](https://github.com/lewky/MarkdownImages/blob/master/resource/seckill/1.png?raw=true)
+ ![image](/images/006.png)
 
 > 用户针对库存业务分析
 
@@ -241,7 +241,7 @@ pom.xml文件中有一些依赖是可以省略不写的，因为有些包会自�
 
 当一个用户在执行秒杀某件商品时，其他也想要秒杀该商品的用户就只能等待，直到上一个用户提交或回滚了事务，他才能够得到该商品的锁执行秒杀操作。这里就涉及到了锁的竞争。
 
- ![2.jpg](https://github.com/lewky/MarkdownImages/blob/master/resource/seckill/2.jpg?raw=true)
+ ![image](/images/007.jpg)
 
 对于MySQL来说，竞争反应到背后的技术是就是事务+行级锁：
 
@@ -253,7 +253,7 @@ start transaction（开启事务）→ update库存数量 → insert购买明细
 
 下面先以天猫的秒杀库存系统为例，如下图
 
- ![3.jpg](https://github.com/lewky/MarkdownImages/blob/master/resource/seckill/3.jpg?raw=true)
+ ![image](/images/005.jpg)
 
 可以看到，天猫的秒杀库存系统是很复杂的，需要很多工程师共同开发。在这里，我们只实现秒杀相关的功能
 
@@ -768,6 +768,7 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 >在本项目中高并发发生在哪？
 
 ![image](/images/concurrent/001.jpg)
+
 在上图中，红色的部分就表示会发生高并发的地方，绿色部分表示对于高并发没有影响。
 
 >为什么需要单独获取系统时间？
