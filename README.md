@@ -1,5 +1,5 @@
-# SSM实战项目——Java高并发秒杀API
-一个整合SSM框架的高并发和商品秒杀项目,学习目前较流行的Java框架组合实现高并发秒杀API
+# SSM实战项目-Java高并发秒杀API
+基于 SpringMVC + Spring + MyBatis 框架模拟高并发商品秒杀项目,学习目前较流行的Java框架组合实现高并发秒杀API
 
 本文包括了项目的完整流程+开发过程中遇到的各种坑的总结+学习笔记和问题扩展
 ## 项目介绍
@@ -128,8 +128,8 @@ git clone https://github.com/albertrui/seckill.git
   
 ---
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>---
-  
-# (一)Java高并发秒杀APi之业务分析与DAO层设计
+
+# (一)Java高并发秒杀API之业务分析与DAO层设计
 ## 1. 创建Maven项目和依赖
 ### 1.1 创建项目前需要先安装Maven，并设置好环境变量
 
@@ -1017,245 +1017,249 @@ public Exposer exportSeckillUrl(long seckillId) {
 2. 对象转hashmap，也就是你想表达的hash的形式，最终存map；
 3. 对象转json，最终存json，其实也就是字符串
 + 第二：其实如果你是平常的项目，并发不高，三个选择都可以，这种情况下以hash的形式更加灵活，可以对象的单个属性，但是问题来了，在秒杀的场景下，三者的效率差别很大。
++ 第三：结果如下：
 
-## 1. 下载`Redis`
-  - 下载完后解压压缩包
-  + 进入解压后的文件夹里面 ,执行命令  `make `
-   + 然后再执行`sudo make install`
-   + 最后再启动`REdis`,启动命令为`redis-server`
-   + 执行命令'redis-cli -p 6379'查看运行情况
-   
-## 2. 使用`Java`操作`Redis`
-+ 导入操作`Redis`的`jedis`的 jar包
-```xml
- <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-```
-+ 添加`protostuff-core`以及`protostuff-runtime`序列化jar包
-```xml
- <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-core</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-runtime</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-```
+![image](/images/concurrent/007.png)
 
-+ 在`org.seckill.dao`下建包`cache`
-  + 然后建立类[RedisDao.java](/src/main/java/org/seckill/dao/cache/RedisDao.java)
++ 第四：你该说了，bytemap最快啊，为啥不用啊，因为项目用了超级强悍的序列化工具啊，以上测试是基于java的序列化，如果改了序列化工具，你可以测试下。
 
-+ 下一步是在在`applicationContext-dao.xml`中注入`redisDao`
-```xml
- <!--注入redisDao-->
-    <bean id="redisDao" class="org.seckill.dao.cache.RedisDao">
-        <!--构造方法注入值-->
-        <constructor-arg index="0" value="localhost"/>
-        <constructor-arg index="1" value="6379"/>
-    </bean>
-```
-+ 改造`exportSeckillUrl`方法,一定要先注入`redisDao`
+>教学视频中张老师对于Redis暴露接口地址的补充
+
++ redis事务与RDBMS事务有本质区别，详情见http://redis.io/topics/transactions
++ 关于spring整合redis。原生Jedis API已经足够清晰。笔者所在的团队不使用任何spring-data整合API，而是直接对接原生Client并做二次开发调优，如Jedis,Hbase等。
++ 这里使用redis缓存方法用于暴露秒杀地址场景，该方法存在瞬时压力，为了降低DB的primary key QPS，且没有使用库存字段所以不做一致性维护。
++ 跨数据源的严格一致性需要2PC支持，性能不尽如人意。线上产品一般使用最终一致性去解决，这块相关知识较多，所以没有讲。
++ 本课程的重点其实不是SSM，只是一个快速开发的方式。重点根据业务场景分析通信成本，瓶颈点的过程和优化思路。
++ 初学者不要纠结于事务。事务可以降低一致性维护难度，但扩展性灵活性存在不足。技术是死的，人是活的。比如京东抢购使用Redis+LUA+MQ方案，就是一种技术反思。
+## 3. 秒杀操作——并发优化
+### 3.1 简单优化
+
+>回顾事务执行
+
+![image](/images/concurrent/008.jpg)
+
+>sql语句的简单优化
+
+![image](/images/concurrent/009.jpg)
+
+>优化SeckillServiceImpl的executeSeckill()
+
++ 用户的秒杀操作分为两步：减库存、插入购买明细，我们在这里进行简单的优化，就是将原本先update（减库存）再进行insert（插入购买明细）的步骤改成：先insert再update。
 ```java
-
- @Autowired
-    private RedisDao redisDao;
-
-@Override
-    public Exposer exportSeckillUrl(long seckillId) {
-        // 根据秒杀的ID去查询是否存在这个商品
-       /* Seckill seckill = seckillDao.queryById(seckillId);
-        if (seckill == null) {
-            logger.warn("查询不到这个秒杀产品的记录");
-            return new Exposer(false, seckillId);
-        }*/
-        Seckill seckill = redisDao.getSeckill(seckillId);
-        if (seckill == null) {
-            // 访问数据库读取数据
-            seckill = seckillDao.queryById(seckillId);
-            if (seckill == null) {
-                return new Exposer(false, seckillId);
-            } else {
-                // 放入redis
-                redisDao.putSeckill(seckill);
-            }
-        }
-
-        // 判断是否还没到秒杀时间或者是过了秒杀时间
-        Date startTime = seckill.getStartTime();
-        Date endTime = seckill.getEndTime();
-        Date nowTime = LocalDateTime.now();
-        //   开始时间大于现在的时候说明没有开始秒杀活动    秒杀活动结束时间小于现在的时间说明秒杀已经结束了
-        if (nowTime.isAfter(startTime) && nowTime.isBefore(endTime)) {
-            //秒杀开启,返回秒杀商品的id,用给接口加密的md5
-            String md5 = getMd5(seckillId);
-            return new Exposer(true, md5, seckillId);
-        }
-        return new Exposer(false, seckillId, nowTime, startTime, endTime);
-
-
+public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException,
+        RepeatKillException, SeckillCloseException {
+    if (md5 == null || !md5.equals(getMD5(seckillId))) {
+        throw new SeckillException("seckill data rewrite");// 秒杀数据被重写了
     }
-```
-+ 写存储过程[seckill.sql](/src/main/sql/seckill.sql),然后去`Mysql`控制台执行储存过程
-
-+ 在`SeckillDao`中编写`killProduce()`方法
-```java
- /**
-     *  使用储存过程执行秒杀
-     * @param paramMap
-     */
-    void killByProcedure(Map<String,Object> paramMap);
-```
-+ 然后在`seckillDao.xml`中写`sql`语句
-
-````xml
-<!--调用储存过程-->
-    <select id="killByProcedure" statementType="CALLABLE">
-        CALL execute_seckill(
-                #{seckillId,jdbcType=BIGINT,mode=IN},
-                #{phone,jdbcType=BIGINT,mode=IN},
-                #{killTime,jdbcType=TIMESTAMP,mode=IN},
-                #{result,jdbcType=INTEGER,mode=OUT}
-        )
-    </select>
-````
-
-+ 下一步在`SeckillService`接口中中编写 `killProduce()`方法
-```java
- SeckillExecution executeSeckillProcedure(long seckillId,long userPhone,String md5);
-```
-+ 导入`commons-collections`工具类
-```xml
- <!--导入apache工具类-->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
-        </dependency>
-```
-+ 然后`SeckillServiceImpl`实现`killProduce()`方法
-```java
-@Override
-    public SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5) {
-        if (md5 == null || !md5.equals(getMd5(seckillId))) {
-            return new SeckillExecution(seckillId, SeckillStatEnum.DATE_REWRITE);
-        }
-        Date killTime = new Date();
-        Map<String, Object> map = new HashMap<>();
-        map.put("seckillId", seckillId);
-        map.put("phone", userPhone);
-        map.put("killTime", killTime);
-        map.put("result", null);
-        // 执行储存过程,result被复制
-        try {
-            seckillDao.killByProcedure(map);
-            // 获取result
-            int result = MapUtils.getInteger(map, "result", -2);
-            if (result == 1) {
+    // 执行秒杀逻辑:减库存+增加购买明细
+    Date nowTime = new Date();
+    try {
+        // 否则更新了库存，秒杀成功,增加明细
+        int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
+        // 看是否该明细被重复插入，即用户是否重复秒杀
+        if (insertCount <= 0) {
+            throw new RepeatKillException("seckill repeated");
+        } else {
+            // 减库存,热点商品竞争
+            int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
+            if (updateCount <= 0) {
+                // 没有更新库存记录，说明秒杀结束 rollback
+                throw new SeckillCloseException("seckill is closed");
+            } else {
+                // 秒杀成功,得到成功插入的明细记录,并返回成功秒杀的信息 commit
                 SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
                 return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS, successKilled);
-            } else {
-                return new SeckillExecution(seckillId, SeckillStatEnum.stateOf(result));
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return new SeckillExecution(seckillId, SeckillStatEnum.INNER_ERROR);
         }
+    } catch (SeckillCloseException e1) {
+        throw e1;
+    } catch (RepeatKillException e2) {
+        throw e2;
+    } catch (Exception e) {
+        logger.error(e.getMessage(), e);
+        // 将编译期异常转化为运行期异常
+        throw new SeckillException("seckill inner error :" + e.getMessage());
     }
+
+}
 ```
-+ 改造执行秒杀`executeSeckill`方法,减少一道虚拟机`GC`程序,优化性能
+>为什么要先insert再update
+
++ 首先是在更新操作的时候给行加锁，插入并不会加锁，如果更新操作在前，那么就需要执行完更新和插入以后事务提交或回滚才释放锁。而如果插入在前，更新在后，那么只有在更新时才会加行锁，之后在更新完以后事务提交或回滚释放锁。
+
++ 在这里，插入是可以并行的，而更新由于会加行级锁是串行的。
+
++ 也就是说是更新在前加锁和释放锁之间两次的网络延迟和GC，如果插入在前则加锁和释放锁之间只有一次的网络延迟和GC，也就是减少的持有锁的时间。
+
++ 这里先insert并不是忽略了库存不足的情况，而是因为insert和update是在同一个事务里，光是insert并不一定会提交，只有在update成功才会提交，所以并不会造成过量插入秒杀成功记录。
+
+### 3.2 深度优化
++ 前边通过调整insert和update的执行顺序来实现简单优化，但依然存在着Java客户端和服务器通信时的网络延迟和GC影响，我们可以将执行秒杀操作时的insert和update放到MySQL服务端的存储过程里，而Java客户端直接调用这个存储过程，这样就可以避免网络延迟和可能发生的GC影响。另外，由于我们使用了存储过程，也就使用不到Spring的事务管理了，因为在存储过程里我们会直接启用一个事务。
+
+#### 3.2.1 写一个存储过程[seckill.sql](/src/main/sql/seckill.sql)，然后在MySQL控制台里执行它
++ 存储过程中，row_count()函数用来返回上一条sql（delete,insert,update）影响的行数。
+
++ 根据row_count()返回值，可以进行接下来的流程判断：
+
+0：未修改数据；
+
+大于0: 表示修改的行数；
+
+小于0: 表示SQL错误或未执行修改SQL
+
+#### 3.2.2 修改源码以调用存储过程
+
++ 在SeckillDao里添加调用存储过程的方法声明
 ```java
+/**
+ *  使用储存过程执行秒杀
+ * @param paramMap
+ */
+void killByProcedure(Map<String,Object> paramMap);
+```
++ 接着在SeckillDao.xml里添加该方法对应的sql语句
+```xml
+<!--调用储存过程 -->
+<select id="killByProcedure" statementType="CALLABLE">
+    CALL execute_seckill(
+        #{seckillId,jdbcType=BIGINT,mode=IN},
+        #{phone,jdbcType=BIGINT,mode=IN},
+        #{killTime,jdbcType=TIMESTAMP,mode=IN},
+        #{result,jdbcType=INTEGER,mode=OUT}
+    )
+</select>
+```
++ 在SeckillService接口里添加一个方法声明
+```java
+/**
+ * 调用存储过程来执行秒杀操作，不需要抛出异常
+ * 
+ * @param seckillId 秒杀的商品ID
+ * @param userPhone 手机号码
+ * @param md5 md5加密值
+ * @return 根据不同的结果返回不同的实体信息
+ */
+SeckillExecution executeSeckillProcedure(long seckillId,long userPhone,String md5);
+```
+>为什么这个方法不需要抛出异常？
 
-@Transactional
-    @Override
-    public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException {
-        if (md5 == null || !md5.equals(getMd5(seckillId))) {
-            logger.error("秒杀数据被篡改");
-            throw new SeckillException("seckill data rewrite");
-        }
-        // 执行秒杀业务逻辑
-        Date nowTIme = new Date();
++ 原本没有调用存储过程的执行秒杀操作之所以要抛出RuntimException，是为了让Spring事务管理器能够在秒杀不成功的时候进行回滚操作。而现在我们使用了存储过程，有关事务的提交或回滚已经在procedure里完成了，前面也解释了不需要再使用到Spring的事务了，既然如此，我们也就不需要在这个方法里抛出异常来让Spring帮我们回滚了。
 
-        try {
-            // 记录购买行为
-            int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
-            if (insertCount <= 0) {
-                // 重复秒杀
-                throw new RepeatKillException("seckill repeated");
-            } else {
-                // 减库存 ,热点商品的竞争
-                int reduceNumber = seckillDao.reduceNumber(seckillId, nowTIme);
-                if (reduceNumber <= 0) {
-                    logger.warn("没有更新数据库记录,说明秒杀结束");
-                    throw new CloseSeckillException("seckill is closed");
-                } else {
-                    // 秒杀成功了,返回那条插入成功秒杀的信息  进行commit
-                    SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
-                    return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS, successKilled);
-                }
-            }
-        } catch (CloseSeckillException | RepeatKillException e1) {
-            throw e1;
-        }
-
++ 在SeckillServiceImpl里实现这个方法,我们需要使用到第三方工具类，所以在pom.xml里导入commons-collections工具类
+```xml
+<!--导入apache工具类-->
+<dependency>
+    <groupId>commons-collections</groupId>
+    <artifactId>commons-collections</artifactId>
+    <version>3.2.2</version>
+</dependency>
+```
++ 在接口的实现类里对executeSeckillProcedure进行实现
+```java
+@Override
+public SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5) {
+    if (md5 == null || !md5.equals(getMD5(seckillId))) {
+        return new SeckillExecution(seckillId, SeckillStatEnum.DATE_REWRITE);
     }
-```
-+ 编写`SeckillServiceImpl`中的`killProduce()`方法的测试方法
-```java
-
- @Test
-    public void executeSeckillProcedureTest() {
-        long seckillId = 1001;
-        long phone = 1368011101;
-        Exposer exposer = seckillService.exportSeckillUrl(seckillId);
-        if (exposer.isExposed()) {
-            String md5 = exposer.getMd5();
-            SeckillExecution execution = seckillService.executeSeckillProcedure(seckillId, phone, md5);
-            System.out.println(execution.getStateInfo());
-        }
+    Date killTime = new Date();
+    Map<String, Object> map = new HashMap<>();
+    map.put("seckillId", seckillId);
+    map.put("phone", userPhone);
+    map.put("killTime", killTime);
+    map.put("result", null);
+    // 执行储存过程,result被复制
+    seckillDao.killByProcedure(map);
+    // 获取result
+    int result = MapUtils.getInteger(map, "result", -2);
+    if (result == 1) {
+        SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
+        return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS, successKilled);
+    } else {
+        return new SeckillExecution(seckillId, SeckillStatEnum.stateOf(result));
     }
-    
+}
 ```
-
-+ 改造`SeckillController`中的`execute`方法调用,把一开始调用普通方法的改成调用储存过程的那个方法
++ 接着对该方法进行测试，在原本的SeckillServiceTest测试类里添加测试方法
 ```java
-  @RequestMapping(value = "/{seckillId}/{md5}/execution", method = RequestMethod.POST)
-     @ResponseBody
-     public SeckillResult<SeckillExecution> execute(@PathVariable("seckillId") long seckillId,
-                                                    @PathVariable("md5") String md5,
-                                                    @CookieValue(value = "userPhone", required = false) Long userPhone) {
-         // 如果用户的手机号码为空的说明没有填写手机号码进行秒杀
-         if (userPhone == null) {
-             return new SeckillResult<>(false, "没有注册");
-         }
-         // 根据用户的手机号码,秒杀商品的id跟md5进行秒杀商品,没异常就是秒杀成功
-         try {
-             // 这里换成储存过程
- 
- //            SeckillExecution execution = seckillService.executeSeckill(seckillId, userPhone, md5);
-             SeckillExecution execution = seckillService.executeSeckillProcedure(seckillId, userPhone, md5);
-             return new SeckillResult<>(true, execution);
-         } catch (RepeatKillException e1) {
-             // 重复秒杀
-             SeckillExecution execution = new SeckillExecution(seckillId, SeckillStatEnum.REPEAT_KILL);
-             return new SeckillResult<>(false, execution);
-         } catch (CloseSeckillException e2) {
-             // 秒杀关闭
-             SeckillExecution execution = new SeckillExecution(seckillId, SeckillStatEnum.END);
-             return new SeckillResult<>(false, execution);
-         } catch (SeckillException e) {
-             // 不能判断的异常
-             SeckillExecution execution = new SeckillExecution(seckillId, SeckillStatEnum.INNER_ERROR);
-             return new SeckillResult<>(false, execution);
-         }
-         // 如果有异常就是秒杀失败
-     }
+@Test
+public void executeSeckillProcedure(){
+    long seckillId = 1001;
+    long phone = 13680115101L;
+    Exposer exposer = seckillService.exportSeckillUrl(seckillId);
+    if (exposer.isExposed()) {
+        String md5 = exposer.getMd5();
+        SeckillExecution execution = seckillService.executeSeckillProcedure(seckillId, phone, md5);
+        logger.info("execution={}", execution);
+    }
+}
 ```
++ 经过测试，发现没有问题，测试通过。然后我们需要把Controller里的执行秒杀操作改成调用存储过程的方法。
+```java
+@RequestMapping(value = "/{seckillId}/{md5}/execution",
+        method = RequestMethod.POST,
+        produces = {"application/json;charset=UTF-8"})
+@ResponseBody
+public SeckillResult<SeckillExecution> execute(@PathVariable("seckillId") Long seckillId,
+                                               @PathVariable("md5") String md5,
+                                               @CookieValue(value = "userPhone",required = false) Long userPhone)
+{
+    if (userPhone==null)
+    {
+        return new SeckillResult<SeckillExecution>(false,"未注册");
+    }
+
+    try {
+        //这里改为调用存储过程
+//            SeckillExecution execution = seckillService.executeSeckill(seckillId, userPhone, md5);
+        SeckillExecution execution = seckillService.executeSeckillProcedure(seckillId, userPhone, md5);
+        return new SeckillResult<SeckillExecution>(true, execution);
+    }catch (RepeatKillException e1)
+    {
+        SeckillExecution execution=new SeckillExecution(seckillId, SeckillStatEnum.REPEAT_KILL);
+        return new SeckillResult<SeckillExecution>(true,execution);
+    }catch (SeckillCloseException e2)
+    {
+        SeckillExecution execution=new SeckillExecution(seckillId, SeckillStatEnum.END);
+        return new SeckillResult<SeckillExecution>(true,execution);
+    }
+    catch (Exception e)
+    {
+        SeckillExecution execution=new SeckillExecution(seckillId, SeckillStatEnum.INNER_ERROR);
+        return new SeckillResult<SeckillExecution>(true,execution);
+    }
+}
+```
+>存储过程优化总结
+
++ 存储过程优化:事务行级锁持有的时间
++ 不要过度依赖存储过程
++ 简单的逻辑依赖存储过程
++ QPS:一个秒杀单6000/qps
++ 经过简单优化和深度优化之后，本项目大概能达到一个秒杀单6000qps（慕课网视频中张老师说的），这个数据对于一个秒杀商品来说其实已经挺ok了，注意这里是指同一个秒杀商品6000qps，如果是不同商品不存在行级锁竞争的问题。
+## 3.3 系统部署架构
+
+![image](/images/concurrent/010.jpg)
+
++ CDN：放置一些静态化资源，或者可以将动态数据分离。一些js依赖直接用公网的CDN，自己开发的一些页面也做静态化处理推送到CDN。用户在CDN获取到的数据不需要再访问我们的服务器，动静态分离可以降低服务器请求量。比如秒杀详情页，做成HTML放在cdn上，动态数据可以通过ajax请求后台获取。
+
++ Nginx：作为http服务器，响应客户请求，为后端的servlet容器做反向代理，以达到负载均衡的效果。
+
++ Redis：用来做服务器端的缓存，通过Jedis提供的API来达到热点数据的一个快速存取的过程，减少数据库的请求量。
+
++ MySQL：保证秒杀过程的数据一致性与完整性。
+
+>智能DNS解析+智能CDN加速+Nginx并发+Redis缓存+MySQL分库分表
+
+![image](/images/concurrent/011.jpg)
+
+>大型系统部署架构，逻辑集群就是开发的部分。
+
++ Nginx做负载均衡
++ 分库分表：在秒杀系统中，一般通过关键的秒杀商品id取模进行分库分表，以512为一张表，1024为一张表。分库分表一般采用开源架构，如阿里巴巴的tddl分库分表框架。
++ 统计分析：一般使用hadoop等架构进行分析
++ 在这样一个架构中，可能参与的角色如下：
+
+![image](/images/concurrent/012.jpg)
 
 ## 写在最后
 
