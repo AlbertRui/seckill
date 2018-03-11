@@ -78,9 +78,9 @@
 项目总结可能比较的长,**密集恐惧症**者请按小节进行阅读  
 
 - [(一)Java高并发秒杀API之业务分析与DAO层](#one) [可参考](/note/note1.md)
-- [(二)Java高并发秒杀API之Service层](#two) [可参考](/note/note2.md)
-- [(三)Java高并发秒杀API之web层](#three) [可参考](/note/note3.md)
-- [(四)Java高并发秒杀API之高并发优化](#four) [可参考](/note/note4.md) 
+- [(二)Java高并发秒杀API之Service层](#two)  [可参考](/note/note2.md)
+- [(三)Java高并发秒杀API之web层](#three)    [可参考](/note/note3.md)
+- [(四)Java高并发秒杀API之高并发优化](#four)    [可参考](/note/note4.md) 
 
 其实这几个流程也就是开发的流程,首先从DAO层开始开发,从后往前开发,开始Coding吧！
 ## 项目源码
