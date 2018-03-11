@@ -77,10 +77,10 @@
 
 项目总结可能比较的长,**密集恐惧症**者请按小节进行阅读  
 
-- [(一)Java高并发秒杀API之业务分析与DAO层](/note/note1.md)
-- [(二)Java高并发秒杀API之Service层](/note/note2.md)
-- [(三)Java高并发秒杀API之web层](/note/note3.md)
-- [(四)Java高并发秒杀API之高并发优化](/note/note4.md) 
+- [(一)Java高并发秒杀API之业务分析与DAO层](#one) [可参考](/note/note1.md)
+- [(二)Java高并发秒杀API之Service层](#two) [可参考](/note/note2.md)
+- [(三)Java高并发秒杀API之web层](#three) [可参考](/note/note3.md)
+- [(四)Java高并发秒杀API之高并发优化](#four) [可参考](/note/note4.md) 
 
 其实这几个流程也就是开发的流程,首先从DAO层开始开发,从后往前开发,开始Coding吧！
 ## 项目源码
@@ -128,7 +128,8 @@ git clone https://github.com/albertrui/seckill.git
   
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-# (一)Java高并发秒杀API之业务分析与DAO层设计
+<h1 id="one">(一)Java高并发秒杀API之业务分析与DAO层设计</h1>
+
 ## 1. 创建Maven项目和依赖
 ### 1.1 创建项目前需要先安装Maven，并设置好环境变量
 
@@ -421,7 +422,8 @@ CDATA指的是不应由 XML 解析器进行解析的文本数据，在XML元素�
 
 测试方法同上，测试结果通过，另外由于我们使用了联合主键，在insert时使用了ignore关键字，所以对于`testInsertSuccessKilled()`重复插入同一条数据是无效的，会被过滤掉，确保了一个用户不能重复秒杀同一件商品。
 
-# (二)Java高并发秒杀API之Service层
+<h1 id="two">(二)Java高并发秒杀API之Service层</h>
+
 ## 1. 设计前的分析
 ### 1.1 分层的必要性
 * DAO层工作演变为:接口设计+SQL编写（不需要其他杂七杂八的功能）
@@ -579,7 +581,7 @@ public class SeckillServiceImpl implements SeckillService
 + 写测试类,建立一个名为[SeckillServiceTest.java](/src/test/java/org/seckill/service/SeckillServiceTest.java)的测试类
 测试的话如果每个方法测试都通过就说明通过,如果报错了话就仔细看下哪一步错了检查下  
 
-# (三)Java高并发秒杀系统API之Web层开发
+<h1 id="three">(三)Java高并发秒杀系统API之Web层开发</h1>
 
 ## 1. 引入SpringMvc了
 >SpringMVC配置和运行流程
@@ -756,7 +758,8 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 
 ![完整的页面](/images/result_1.jpg)
 
-# (四)Java高并发秒杀API之高并发优化
+<h1 id="four">(四)Java高并发秒杀API之高并发优化</h>
+
 ## 1. 高并发优化分析
 >关于并发
 
