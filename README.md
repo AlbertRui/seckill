@@ -86,9 +86,8 @@
 
 * [**GitHub地址**](https://github.com/albertrui/Seckill)
 
----
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>---
----
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 ## 项目效果图
  - 秒杀商品列表  
  
@@ -126,8 +125,7 @@ git clone https://github.com/albertrui/seckill.git
   - Eclipse    
   这个项目是基于`IDEA`创建,可以把把项目转成`Eclipse`的项目,如果你使用Eclipse的话也可以直接导入,只是步骤更繁琐一点,[Eclipse导入步骤](/note/EclipseImport.md)
   
----
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>---
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 # (一)Java高并发秒杀API之业务分析与DAO层设计
 ## 1. 创建Maven项目和依赖
@@ -149,12 +147,12 @@ git clone https://github.com/albertrui/seckill.git
 **第二种创建方式：借助IDE工具的Maven插件来创建项目(这里使用idea)**
   + 点击左上角`File>New>Project>Maven`
   + 然后在里面勾选`Create from archetype`,然后再往下拉找到`org.apache.cocoon:cocoon-22-archetype-webapp`,选中它,注意要先勾选那个选项,否则选择不了,然后点击`Next`继续  
-  ![创建Maven项目](images/001.png)    
-  +然后就填写你的Maven的那几个重要的坐标了,自己看着填吧  
+  ![创建Maven项目](images/001.png)  
+  + 然后就填写你的Maven的那几个重要的坐标了,自己看着填吧  
   ![填写Maven坐标](images/002.png)  
-  +再就配置你的Maven的相关信息,默认应该是配置好的  
+  + 再就配置你的Maven的相关信息,默认应该是配置好的  
   ![填写Maven在你本机的位置](images/003.png)  
-  +之后就是点`Finsh`,到此不出意外的话就应该创建成功了
+  + 之后就是点`Finsh`,到此不出意外的话就应该创建成功了
   ####  这里我们需要修改下`web.xml`中的servlet版本为`3.0`
   打开`WEB-INF`下的`web.xml`,修改为以下代码:
   ```xml
@@ -167,11 +165,11 @@ git clone https://github.com/albertrui/seckill.git
       <!--用maven创建的web-app需要修改servlet的版本为3.0-->
   ```
   修改的原因有以下几点:  
-     * 高版本的Servlet支持更多的特性,更方便我们的Coding,特别是支持注解这一特性
-     * 在`Servlet2.3`中新加入了`Listener`接口的实现,,我们可以使用`Listener`引入`Spring`的`ContextLoaderListener`  
+  * 高版本的Servlet支持更多的特性,更方便我们的Coding,特别是支持注解这一特性
+  * 在`Servlet2.3`中新加入了`Listener`接口的实现,,我们可以使用`Listener`引入`Spring`的`ContextLoaderListener`  
   
   举个栗子:  
-    + 在`Servlet2.3`以前我们这样配置`ContextLoaderListener`:
+  + 在`Servlet2.3`以前我们这样配置`ContextLoaderListener`:
   ```xml
   <servlet>
    <servlet-name>context</servlet-name>
@@ -179,7 +177,7 @@ git clone https://github.com/albertrui/seckill.git
    <load-on-startup>1</load-on-startup>
   </servlet>
   ```
-   + 在`Servlet2.3`以后可以使用`Listener`配置,也就是我们项目中使用的方法
+  + 在`Servlet2.3`以后可以使用`Listener`配置,也就是我们项目中使用的方法
    ````xml
   <listener>
    <listener-class>org.springframework.context.ContextLoaderListener</listener-class>
@@ -247,7 +245,7 @@ pom.xml文件中有一些依赖是可以省略不写的，因为有些包会自�
 
 start transaction（开启事务）→ update库存数量 → insert购买明细 → commit（提交事务）
 
-在秒杀系统中，在同一时刻会有很多用户在秒杀同一件商品，那么如何高效低处理这些竞争？如何高效地提交事务？这些将在[Java高并发秒杀API(四)之高并发优化](http://blog.csdn.net/lewky_liu/article/details/78166080)进行分析总结。
+在秒杀系统中，在同一时刻会有很多用户在秒杀同一件商品，那么如何高效低处理这些竞争？如何高效地提交事务？这些将在后续进行分析总结。
 
 >实现哪些秒杀功能？
 
@@ -278,12 +276,14 @@ start transaction（开启事务）→ update库存数量 → insert购买明细
 + 我们的建表过程，可能会出现建表失败的情况。原因是当你给一个timestamp设置为on update current_timestamp的时候，其他的timestamp字段需要显式设定default值。但是如果你有两个timestamp字段，但是只把第一个设定为current_timestamp而第二个没有设定默认值，MySQL也能成功建表,但是反过来就不行。这是mysql5.5版本对timestamp的处理。为了解决这个问题，将create_time放到start_time和end_time的前面，还有的mysql版本需要将三个时间戳都设置默认值。
 + 在建立数据库时,如果按照我这里的数据库脚本建立的话应该是没问题的,但是我按照视频里面的数据库脚本建表的话发生了一个错误  
   ![sql报错](images/sqlError.png)
- 这个报错看起来比较的诡异,我仔细检查`sql`也没有错误,它总提示我`end_time`要有一个默认的值,可我记得我以前就不会这样,然后视频里面也没有执行错误,然后我感觉可能时`MySQL`版本的差异,我查看了下我数据库版本,在登录`Mysql`控制台后输入指令,在控制台的我暂时知道的有两种方式:
+    + 这个报错看起来比较的诡异,我仔细检查`sql`也没有错误,它总提示我`end_time`要有一个默认的值,可我记得我以前就不会这样,然后视频里面也没有执行错误,然后我感觉可能时`MySQL`版本的差异,我查看了下我数据库版本,在登录`Mysql`控制台后输入指令,在控制台的我暂时知道的有两种方式:
  ```sql
 select version();  
 select @@version;
 ```
-我的输出结果如下:
+
+   * 我的输出结果如下:
+    
 ![Mysql版本](images/mysqlVersion.png)
 其实登录进控制台就已经可以看到版本了,我的Mysql是`5.7`的,以前我用的时`5.6`的,然后去`Google`上搜索了下,找到了几个答案,参考链接：  
   - [Invalid default value for 'create_date' timestamp field
@@ -294,8 +294,7 @@ select @@version;
 总结出来一句话就是:
 > mysql 5.7中,默认使用的是严格模式,这里的日期必须要有时间,所以一定要给出默认值,要么就修改数据库设置  
 
-然后网友评论里总结出来的几种解决办法,未经测试！：  
- + 下次有问题一定要先看一下评论！！！create不了的同学,可以这样写：
++ 然后网友评论里总结出来的几种解决办法,未经测试！下次有问题一定要先看一下评论！！！create不了的同学,可以这样写：
  ```sql
     `start_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀开始时间',
     `end_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀结束时间',
@@ -304,18 +303,18 @@ select @@version;
     
 + 关于timestamp的问题,需要先运行 set explicit_defaults_for_timestamp = 1,否则会报invalid default value错误
 + 还需要注意的是SQL版本的问题会导致视频中seckill表创建会出错。只要将create_time放在start_time和end_time之前是方便的解决方法。  
-
- 对比下我修改过后的跟视频里面的`sql`片段:
- ![sql对比](/images/sqlCompare.png)  
- 我们可以看到在这三个字段有一个小差别,那就是给`start_time`,`end_time`,`create_time`三个字段都添加一个默认值,然后执行数据库语句就没问题了
++ 对比下我修改过后的跟视频里面的`sql`片段:
+ ![sql对比](/images/sqlCompare.png) 
+  
++ 我们可以看到在这三个字段有一个小差别,那就是给`start_time`,`end_time`,`create_time`三个字段都添加一个默认值,然后执行数据库语句就没问题了
  
- ### 3.2 创建数据表对应的实体类
+### 3.2 创建数据表对应的实体类
  
  >在`src/main/java`包下创建org.seckill.entity包，接着建立[Seckill.java](/src/main/java/org/seckill/entity/Seckill.java)实体类
  
  >在`org.seckill.entity`包下，接着建立[SuccessKilled.java](/src/main/java/org/seckill/entity/SuccessKilled.java)实体类
  
- ### 3.3 创建实体类对应的DAO层接口（也就是Mapper接口，DAO针对的是具体实体来操作的“实体的增删改查”）
+### 3.3 创建实体类对应的DAO层接口（也就是Mapper接口，DAO针对的是具体实体来操作的“实体的增删改查”）
  
  >在`src/main/java`下建立`org.seckill.dao`包，在包下建立[SeckillDao.java](/src/main/java/org/seckill/dao/SeckillDao.java)接口
  
@@ -329,42 +328,42 @@ select @@version;
  
  >MyBatis怎么用？SQL写在哪里？
  
- Mybatis有两种提供SQL的方式：XML提供SQL、注解提供SQL（注解是java5.0之后提供的一个新特性）。
+ + Mybatis有两种提供SQL的方式：XML提供SQL、注解提供SQL（注解是java5.0之后提供的一个新特性）。
  
- 对于实际的使用中建议使用XML文件的方式提供SQL。如果通过注解的方式提供SQL，由于注解本身还是java源码，这对于修改和调整SQL其实是非常不方便的，一样需要重新编译类，当我们写复杂的SQL尤其拼接逻辑时，注解处理起来就会非常繁琐。而XML提供了很多的SQL拼接和处理逻辑的标签，可以非常方便的帮我们去做封装。 
+ + 对于实际的使用中建议使用XML文件的方式提供SQL。如果通过注解的方式提供SQL，由于注解本身还是java源码，这对于修改和调整SQL其实是非常不方便的，一样需要重新编译类，当我们写复杂的SQL尤其拼接逻辑时，注解处理起来就会非常繁琐。而XML提供了很多的SQL拼接和处理逻辑的标签，可以非常方便的帮我们去做封装。 
  
  >如何去实现DAO接口？
  
- Mapper自动实现DAO（也就是DAO只需要设计接口，不需要去写实现类，MyBatis知道我们的参数、返回类型是什么，同时也有SQL文件，它可以自动帮我们生成接口的实现类来帮我们执行参数的封装，执行SQL，把我们的返回结果集封装成我们想要的类型） 。
+ + Mapper自动实现DAO（也就是DAO只需要设计接口，不需要去写实现类，MyBatis知道我们的参数、返回类型是什么，同时也有SQL文件，它可以自动帮我们生成接口的实现类来帮我们执行参数的封装，执行SQL，把我们的返回结果集封装成我们想要的类型） 。
  
- 第二种是通过API编程方式实现DAO接口（MyBatis通过给我们提供了非常多的API，跟其他的ORM和JDBC很像）
+ + 第二种是通过API编程方式实现DAO接口（MyBatis通过给我们提供了非常多的API，跟其他的ORM和JDBC很像）
  
- 在实际开发中建议使用Mapper自动实现DAO，这样可以直接只关注SQL如何编写，如何去设计DAO接口，帮我们节省了很多的维护程序，所有的实现都是MyBatis自动完成。
+ + 在实际开发中建议使用Mapper自动实现DAO，这样可以直接只关注SQL如何编写，如何去设计DAO接口，帮我们节省了很多的维护程序，所有的实现都是MyBatis自动完成。
  
  >创建一个目录存放Mybatis的SQL映射
  
- 按照Maven的规范，SQL映射文件应该放在`src/main/resources`包下，在该包下建立`mapper`目录，用来存放映射DAO接口的XML文件。这样Maven在编译时就会自动将`src/main/resources`下的这些配置文件编译进来。
+ + 按照Maven的规范，SQL映射文件应该放在`src/main/resources`包下，在该包下建立`mapper`目录，用来存放映射DAO接口的XML文件。这样Maven在编译时就会自动将`src/main/resources`下的这些配置文件编译进来。
  
- 我们也可以按照原本的习惯，在`src/main/java`下建立`org.seckill.mapper`包，将这些SQL映射存放到这里。由于Maven默认不会编译`src/main/java`下除源码以外的文件，所以需要在pom.xml中进行额外的配置。
- 
-    <build>
- 		<finalName>seckill</finalName>
- 		<resources>
- 			<!--打包时包含源代码包下的资源文件，默认情况下只会打包src/main/java下的源代码 -->
- 			<resource>
- 				<directory>src/main/java</directory>
- 				<includes>
- 					<include>**/*.xml</include>
- 				</includes>
- 				<filtering>false</filtering>
- 			</resource>
- 			<resource>
- 				<directory>src/main/resources</directory>
- 			</resource>
- 		</resources>
- 	</build>
- 	
-在本项目中，我是采用的第一种方式存放Mybatis的SQL映射。
+ + 我们也可以按照原本的习惯，在`src/main/java`下建立`org.seckill.mapper`包，将这些SQL映射存放到这里。由于Maven默认不会编译`src/main/java`下除源码以外的文件，所以需要在pom.xml中进行额外的配置。
+```xml
+<build>
+    <finalName>seckill</finalName>
+    <resources>
+        <!--打包时包含源代码包下的资源文件，默认情况下只会打包src/main/java下的源代码 -->
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*.xml</include>
+            </includes>
+            <filtering>false</filtering>
+        </resource>
+        <resource>
+            <directory>src/main/resources</directory>
+        </resource>
+    </resources>
+</build>
+```
++ 在本项目中，我是采用的第一种方式存放Mybatis的SQL映射。
 
 >在`src/main/resources`目录下配置[mybatis-config.xml](/src/main/resources/mybatis-config.xml)（配置MyBatis的全局属性）
 
@@ -404,16 +403,17 @@ CDATA指的是不应由 XML 解析器进行解析的文本数据，在XML元素�
 
 ### 3.6 DAO层单元测试
 
-有不知道idea如何直接进行生成快速的测试单元的，可以看看[这篇文章](http://blog.csdn.net/jj_nan/article/details/64134781)
++ 有不知道idea如何直接进行生成快速的测试单元的，可以看看[这篇文章](http://blog.csdn.net/jj_nan/article/details/64134781)
 
-使用idea工具直接生成测试单元，这些测试代码按照Maven规范放到`src/test/java`包下。在生成的测试代码里测试我们的方法，测试的具体代码如下：
++ 使用idea工具直接生成测试单元，这些测试代码按照Maven规范放到`src/test/java`包下。在生成的测试代码里测试我们的方法，测试的具体代码如下：
+
 [SeckillDaoTest](/src/test/java/org/seckill/dao/SeckillDaoTest.java)
 
 >测试说明
 
-先左键单击要测试的那个方法名，再右键点击选择`Debug As`可以单独对该方法进行单元测试。三个方法都测试通过，但是对于最后一个方法会发现数据库中该商品数量并没有减少，这是因为我们设置了秒杀时间，当前时间不满足秒杀时间，所以不会秒杀成功减少数量。
++ 先左键单击要测试的那个方法名，再右键点击选择`Debug As`可以单独对该方法进行单元测试。三个方法都测试通过，但是对于最后一个方法会发现数据库中该商品数量并没有减少，这是因为我们设置了秒杀时间，当前时间不满足秒杀时间，所以不会秒杀成功减少数量。
 
-如果之前没有在DAO接口的多参数方法里在形参前加上@Param注解，那么在这里进行单元测试时，MyBatis会报绑定参数失败的错误，因为无法找到参数。这是因为Java没有保存行参的记录，Java在运行的时候会把`queryAll(int offset,int limit)`中的参数变成这样`queryAll(int arg0,int arg1)`，导致MyBatis无法识别这两个参数。
++ 如果之前没有在DAO接口的多参数方法里在形参前加上@Param注解，那么在这里进行单元测试时，MyBatis会报绑定参数失败的错误，因为无法找到参数。这是因为Java没有保存行参的记录，Java在运行的时候会把`queryAll(int offset,int limit)`中的参数变成这样`queryAll(int arg0,int arg1)`，导致MyBatis无法识别这两个参数。
 [SuccessKilledDaoTest.java](/src/test/java/org/seckill/dao/SuccessKilledDaoTest.java)
 
 >测试说明
@@ -471,30 +471,29 @@ MD5盐值字符串（salt），用于混淆MD5，添加MD5反编译难度
   + 首选可能会出现秒杀关闭后被秒杀情况,所以建立秒杀关闭异常[CloseSeckillException.java](/src/main/java/org/seckill/exception/CloseSeckillException.java),需要继承我们一开始写的基础异常 
   + 然后还有可能发生重复秒杀异常[RepeatSeckillException.java](/src/main/java/org/seckill/exception/RepeatSeckillException.java)
 ### 2.4 实现`Service`接口: [SeckillServiceImpl.java](/src/main/java/org/seckill/service/impl/SeckillServiceImpl.java)
-在这里我们捕获了运行时异常,这样做的原因就是`Spring`的事物默认就是发生了`RuntimeException`才会回滚,可以检测出来的异常是不会导致事物的回滚的,这样的目的就是你明知道这里会发生异常,所以你一定要进行处理.如果只是为了让编译通过的话,那捕获异常也没多意思,所以这里要注意事物的回滚.  
-然后我们还发现这里存在硬编码的现象,就是返回各种字符常量,例如`秒杀成功`,`秒杀失败`等等,这些字符串时可以被重复使用的,而且这样维护起来也不方便,要到处去类里面寻找这样的字符串,所有我们使用枚举类来管理这样状态,在`org.seckill`包下建立`enums`包,专门放置枚举类,然后再建立[SeckillStatEnum](/src/main/java/org/seckill/enums/SeckillStateEnum.java)枚举类:
-既然把这些改成了枚举,那么在[SeckillServiceImpl.java](/src/main/java/org/seckill/service/impl/SeckillServiceImpl.java)类中的`executeSeckill`方法中成功秒杀的返回值就应该修改为  
+
++ 在这里我们捕获了运行时异常,这样做的原因就是`Spring`的事物默认就是发生了`RuntimeException`才会回滚,可以检测出来的异常是不会导致事物的回滚的,这样的目的就是你明知道这里会发生异常,所以你一定要进行处理.如果只是为了让编译通过的话,那捕获异常也没多意思,所以这里要注意事物的回滚.  
++ 然后我们还发现这里存在硬编码的现象,就是返回各种字符常量,例如`秒杀成功`,`秒杀失败`等等,这些字符串时可以被重复使用的,而且这样维护起来也不方便,要到处去类里面寻找这样的字符串,所有我们使用枚举类来管理这样状态,在`org.seckill`包下建立`enums`包,专门放置枚举类,然后再建立[SeckillStatEnum](/src/main/java/org/seckill/enums/SeckillStateEnum.java)枚举类:
++ 既然把这些改成了枚举,那么在[SeckillServiceImpl.java](/src/main/java/org/seckill/service/impl/SeckillServiceImpl.java)类中的`executeSeckill`方法中成功秒杀的返回值就应该修改为  
 ```java
 return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS, successKilled);
 ```
-改了这里以后会发现会报错,因为在实体类那边构造函数可不是这样的,然后修改`SeckillExecution`类的构造函数,把`state`跟`stateInfo`的值设置从构造函数里面的`SeckillStatEnum`中取出值来设置：
++ 改了这里以后会发现会报错,因为在实体类那边构造函数可不是这样的,然后修改`SeckillExecution`类的构造函数,把`state`跟`stateInfo`的值设置从构造函数里面的`SeckillStatEnum`中取出值来设置：
 ````java
+/*秒杀成功返回的实体  */
+public SeckillExecution(long seckillId, SeckillStatEnum statEnum, SuccessKilled successKilled) {
+    this.seckillId = seckillId;
+    this.state = statEnum.getState();
+    this.stateInfo = statEnum.getInfo();
+    this.successKilled = successKilled;
+}
 
-/*  秒杀成功返回的实体  */
-    public SeckillExecution(long seckillId, SeckillStatEnum statEnum, SuccessKilled successKilled) {
-        this.seckillId = seckillId;
-        this.state = statEnum.getState();
-        this.stateInfo = statEnum.getInfo();
-        this.successKilled = successKilled;
-    }
-
-    /*  秒杀失败返回的实体  */
-    public SeckillExecution(long seckillId, SeckillStatEnum statEnum) {
-        this.seckillId = seckillId;
-        this.state = statEnum.getState();
-        this.stateInfo = statEnum.getInfo();
-    }
-
+/*  秒杀失败返回的实体  */
+public SeckillExecution(long seckillId, SeckillStatEnum statEnum) {
+    this.seckillId = seckillId;
+    this.state = statEnum.getState();
+    this.stateInfo = statEnum.getInfo();
+}
 ````
 
 ## 3.  Spring IOC 注入Service
@@ -514,21 +513,20 @@ return new SeckillExecution(seckillId, SeckillStatEnum.SUCCESS, successKilled);
    
 >事务管理器
 
-MyBatis采用的是JDBC的事务管理器
-
-Hibernate采用的是Hibernate的事务管理器
++ MyBatis采用的是JDBC的事务管理器
++ Hibernate采用的是Hibernate的事务管理器
 
 >通过注解的方式将Service的实现类（注意，不是Service接口）加入到Spring IoC容器中
-
+```java
 @Service
 public class SeckillServiceImpl implements SeckillService;
+```
 >在需要进行事务声明的方法上加上事务的注解@Transactional
-
+```java
+/*Spring的声明式事务管理*/
 @Transactional
-public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5)
-        throws SeckillException, RepeatKillException, SeckillCloseException {}
-Spring的声明式事务管理
-
+public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatKillException, SeckillCloseException {}
+```
 >异常捕获机制
 
 Java异常分编译期异常和运行期异常，运行期异常不需要手工try-catch，Spring的的声明式事务只接收运行期异常回滚策略，非运行期异常不会帮我们回滚。
@@ -554,10 +552,10 @@ Spring一共有7个事务传播行为，默认的事务传播行为是PROPAGATIO
 + 在Spring早期版本中是使用ProxyFactoryBean+XMl方式来配置事务。
 + 在Spring配置文件使用tx:advice+aop命名空间，好处就是一次配置永久生效，你无须去关心中间出的问题，不过出错了你很难找出来在哪里出了问题。
 + 注解@Transactional的方式，注解可以在方法定义、接口定义、类定义、public方法上，但是不能注解在private、final、static等方法上，因为Spring的事务管理默认是使用Cglib动态代理的： 
-private方法因为访问权限限制，无法被子类覆盖
-final方法无法被子类覆盖
-static是类级别的方法，无法被子类覆盖
-protected方法可以被子类覆盖，因此可以被动态字节码增强
+    - private方法因为访问权限限制，无法被子类覆盖
+    - final方法无法被子类覆盖
+    -static是类级别的方法，无法被子类覆盖
+    - protected方法可以被子类覆盖，因此可以被动态字节码增强
 >不能被Spring AOP事物增强的方法  
 
   | 序号 | 动态代理策略 |不能被事物增强的方法 |
@@ -565,20 +563,19 @@ protected方法可以被子类覆盖，因此可以被动态字节码增强
   |  1    |基于接口的动态代理  |出了public以外的所有方法,并且 public static 的方法也不能被增强 |
   |   2   |基于Cglib的动态代理  | private,static,final的方法 |
   
-然后你要在`Service`类上添加注解`@Service`,不用在接口上添加注解：
++ 然后你要在`Service`类上添加注解`@Service`,不用在接口上添加注解：
 ```java
-
 @Service
 public class SeckillServiceImpl implements SeckillService 
 ```
-既然已经开启了基于注解的事物,那我们就去需要被事物的方法上加个注解`@Transactional`吧:
++ 既然已经开启了基于注解的事物,那我们就去需要被事物的方法上加个注解`@Transactional`吧:
 ```java
 @Transactional
     @Override
     public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException 
 ```
 ### 3.2 Service层的测试
-写测试类,建立一个名为[SeckillServiceTest.java](/src/test/java/org/seckill/service/SeckillServiceTest.java)的测试类
++ 写测试类,建立一个名为[SeckillServiceTest.java](/src/test/java/org/seckill/service/SeckillServiceTest.java)的测试类
 测试的话如果每个方法测试都通过就说明通过,如果报错了话就仔细看下哪一步错了检查下  
 
 # (三)Java高并发秒杀系统API之Web层开发
@@ -628,9 +625,8 @@ public class SeckillServiceImpl implements SeckillService
 SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像我这里配置的`servlet-name`是`seckill-dispatchServlet`的话,则默认会寻找`WEB-INF`一个名为`seckill-dispatchServlet-Servlet.xml`的配置文件
 
 ## 2. 接下来编写Controller
-首先在`org.seckill`下建立包名为`web`的包,然后在里面新建一个类[SeckillController.java](/src/main/java/org/seckill/web/SeckillController.java)：
-#### 建立一个全局处理ajax请求返回结果的类
-[SeckillResult](/src/main/java/org/seckill/dto/SeckillResult.java)
++ 首先在`org.seckill`下建立包名为`web`的包,然后在里面新建一个类[SeckillController.java](/src/main/java/org/seckill/web/SeckillController.java)：
++ 其次建立一个全局处理ajax请求返回结果的类：[SeckillResult](/src/main/java/org/seckill/dto/SeckillResult.java)
 
 ## 3. 前端页面编写
 ### 3.1 前端交互过程分析
@@ -646,10 +642,10 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 
 ![image](/images/front/url.jpg)
 ### 3.2 前端页面开发
-因为项目的前端页面都是由`Bootstrap`开发的,所以我们要先去下载`Bootstrap`或者是使用在线的CDN.  
- -[Bootstrap中文官网](http://www.bootcss.com/)  
- -[Bootstrap中文文档](http://v3.bootcss.com/)
- 使用在线CDN引入的方法:
++ 因为项目的前端页面都是由`Bootstrap`开发的,所以我们要先去下载`Bootstrap`或者是使用在线的CDN.  
+    - [Bootstrap中文官网](http://www.bootcss.com/)  
+    - [Bootstrap中文文档](http://v3.bootcss.com/)
++ 使用在线CDN引入的方法:
  ```html
 <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
 <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -685,13 +681,13 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
  - 编写 [list.jsp](/src/main/webapp/WEB-INF/jsp/list.jsp)
 
  - 编写列表页面,位于`WEB-INF`下的[detail.jsp](/src/main/webapp/WEB-INF/jsp/detail.jsp)秒杀详情页面
-  然后把项目运行一下我们可能又会碰到一个错误就是`jstl`中的`fmt`标签格式化时间只能格式化`java.Util.Date`类型的日期跟时间,而在我们这里我么使用了`java8`的`LocalDateTIme`,所以解析时间会出异常,这时我们应该想到自己去实现`jstl`标签来自定义解析这个时间日期
+  然后把项目运行一下我们可能又会碰到一个错误就是`jstl`中的`fmt`标签格式化时间只能格式化`java.Util.Date`类型的日期跟时间,而在我们这里如果我们使用了`java8`的`LocalDateTIme`,所以解析时间会出异常,这时我们应该想到自己去实现`jstl`标签来自定义解析这个时间日期
   自定义标签步骤如下:  
-  - 在` /WEB-INF `创建目录 `tags`
-  - 然后创建一个文件` localDateTime.tag` 在`tags`目录下
-     + `localData.tag`用来格式化日期
+    - 在` /WEB-INF `创建目录 `tags`
+    - 然后创建一个文件` localDateTime.tag` 在`tags`目录下
+      + `localData.tag`用来格式化日期
       + `localDataTime.tag`用来格式化日期跟时间的组合,也就是数据库中的`Timestamp`类型
-  -然后在`localDataTime.tag`中写自己自定义的格式化流程
+      + 然后在`localDataTime.tag`中写自己自定义的格式化流程
   ```xml
 <%--格式化java8的LocalDatime,解决jstl不支持java8时间的问题--%>
 <%@ tag body-content="empty" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
@@ -741,59 +737,7 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 <fmt:formatDate value="${parsedDate}" type="date" pattern="${pattern}"/>
 ```
 
- - 然后我们去页面导入需要的标签,然后去使用,修改`list.jsp`文件
- ```jsp
-<%@page contentType="text/html; charset=UTF-8" language="java" %>
-<%@include file="common/tag.jsp" %>  
-<%@taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <title>秒杀列表</title>
-    <%@include file="common/head.jsp" %>
-</head>
-<body>
-
-<div class="container">
-    <div class="panel panel-default">
-        <div class="panel-heading text-center">
-            <h2>秒杀列表</h2>
-        </div>
-
-        <div class="panel-body">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <td>名称</td>
-                    <td>库存</td>
-                    <td>开始时间</td>
-                    <td>结束时间</td>
-                    <td>创建时间</td>
-                    <td>详情页</td>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${list}" var="sk">
-                    <tr>
-                        <td>${sk.name}</td>
-                        <td>${sk.number}</td>
-                        <td><tags:localDataTime dateTime="${sk.startTime}"/></td>
-                        <td><tags:localDataTime dateTime="${sk.endTime}"/></td>
-                        <td><tags:localDataTime dateTime="${sk.createTIme}"/></td>
-                        <td><a class="btn btn-info" href="/seckill/${sk.seckillId}/detail" target="_blank">详情</a></td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-</body>
-<script src="${pageContext.request.contextPath}/resources/plugins/jquery.js"></script>
-<script src="${pageContext.request.contextPath}/resources/plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
-</html>
-```
- 在这里我们修改了几个地方:
+- 然后我们去页面导入需要的标签,然后去使用,修改`list.jsp`文件，在这里我们修改了几个地方:
  ```jsp
  <%@taglib prefix="tags" tagdir="/WEB-INF/tags" %> 
 ```
@@ -802,13 +746,14 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
  <td><tags:localDataTime dateTime="${sk.endTime}"/></td>
  <td><tags:localDataTime dateTime="${sk.createTIme}"/></td>
 ```
-然后我们的格式就应该可以正常被格式化出来了
- -  建立一个模块化的[seckill.js](/src/main/webapp/resources/script/seckill.js)文件,位于`Webapp`下 `resources`下`script`文件夹下
-自定义jstl标签参考资料  
++ 然后我们的格式就应该可以正常被格式化出来了
+    - 建立一个模块化的[seckill.js](/src/main/webapp/resources/script/seckill.js)文件,位于`Webapp`下 `resources`下`script`文件夹下
+    - 自定义jstl标签参考资料  
 [stackoverflow上的资料1](https://stackoverflow.com/questions/35606551/jstl-localdatetime-format)  
 [stackoverflow上的资料2](https://stackoverflow.com/questions/30230517/taglib-to-display-java-time-localdate-formatted)  
-编写完了就部署运行吧,不出意外的话就是这个样子的:  
-![完整的页面](../images/result_1.jpg)
++ 编写完了就部署运行吧,不出意外的话就是这个样子的:  
+
+![完整的页面](/images/result_1.jpg)
 
 # (四)Java高并发秒杀API之高并发优化
 ## 1. 高并发优化分析
@@ -823,9 +768,8 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 
 >为什么需要单独获取系统时间？
 
-这是为了我们的秒杀系统的优化做铺垫。比如在秒杀还未开始的时候，用户大量刷新秒杀商品详情页面是很正常的情况，这时候秒杀还未开始，大量的请求发送到服务器会造成不必要的负担。
-
-我们将这个详情页放置到CDN中，这样用户在访问该页面时就不需要访问我们的服务器了，起到了降低服务器压力的作用。而CDN中存储的是静态化的详情页和一些静态资源（css，js等），这样我们就拿不到系统的时间来进行秒杀时段的控制，所以我们需要单独设计一个请求来获取我们服务器的系统时间。
++ 这是为了我们的秒杀系统的优化做铺垫。比如在秒杀还未开始的时候，用户大量刷新秒杀商品详情页面是很正常的情况，这时候秒杀还未开始，大量的请求发送到服务器会造成不必要的负担。
++ 我们将这个详情页放置到CDN中，这样用户在访问该页面时就不需要访问我们的服务器了，起到了降低服务器压力的作用。而CDN中存储的是静态化的详情页和一些静态资源（css，js等），这样我们就拿不到系统的时间来进行秒杀时段的控制，所以我们需要单独设计一个请求来获取我们服务器的系统时间。
 
 ![image](/images/concurrent/003.png)
 
@@ -840,7 +784,6 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 >秒杀地址接口分析
 
 + 无法使用CDN缓存，因为CDN适合请求对应的资源不变化的，比如静态资源、JavaScript；秒杀地址返回的数据是变化的，不适合放在CDN缓存；
-
 + 适合服务端缓存：Redis等，1秒钟可以承受10万qps。多个Redis组成集群，可以到100w个qps. 所以后端缓存可以用业务系统控制。
 
 >秒杀地址接口优化
@@ -849,15 +792,10 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 
 >秒杀操作优化分析
 
-+ 无法使用cdn缓存
++ 无法使用cdn缓存:大部分写的操作和核心操作无法使用CDN，也不可能在缓存中减库存。你在Redis中减库存，那么用户也可能通过缓存来减库存，这样库存会不一致，所以要通过mysql的事务来保证一致性。
 + 后端缓存困难： 库存问题
-+ 一行数据竞争：热点商品
-
-大部分写的操作和核心操作无法使用CDN，也不可能在缓存中减库存。你在Redis中减库存，那么用户也可能通过缓存来减库存，这样库存会不一致，所以要通过mysql的事务来保证一致性。
-
-比如一个热点商品所有人都在抢，那么会在同一时间对数据表中的一行数据进行大量的update set操作。
-
-行级锁在commit之后才释放，所以优化方向是减少行级锁的持有时间。
++ 一行数据竞争：热点商品,比如一个热点商品所有人都在抢，那么会在同一时间对数据表中的一行数据进行大量的update set操作。
++ 行级锁在commit之后才释放，所以优化方向是减少行级锁的持有时间。
 
 >延迟问题很关键
 
@@ -869,27 +807,25 @@ SpringMvc默认就会默认去`WEB-INF`下查找默认规范的配置文件,像�
 
 >如何判断update更新库存成功？
 
-+ 有两个条件：
-
-update自身没报错、客户端确认update影响记录数
++ 有两个条件：update自身没报错、客户端确认update影响记录数
 
 >优化思路：
 
-把客户端逻辑放到MySQL服务端，避免网络延迟和GC影响
-如何把客户端逻辑放到MySQL服务端
++ 把客户端逻辑放到MySQL服务端，避免网络延迟和GC影响
++ 如何把客户端逻辑放到MySQL服务端
 
 >有两种方案：
 
 + 定制SQL方案，在每次update后都会自动提交，但需要修改MySQL源码，成本很高，不是大公司（BAT等）一般不会使用这种方法。
 + 使用存储过程：整个事务在MySQL端完成，用存储过程写业务逻辑，服务端负责调用。
 
-接下来先分析第一种方案
++ 接下来先分析第一种方案
 
 ![image](/images/concurrent/005.jpg)
 
 ![image](/images/concurrent/006.jpg)
 
-根据上图的成本分析，我们的秒杀系统采用第二种方案，即使用存储过程。
++ 根据上图的成本分析，我们的秒杀系统采用第二种方案，即使用存储过程。
 
 >优化总结
 
@@ -903,15 +839,13 @@ update自身没报错、客户端确认update影响记录数
 由于不同公司提供的CDN的接口暴露不同，不同的公司租用的机房调用的API也不相同，所以慕课网的视频中并没有对CDN的使用过程进行讲解。
 
 ### 2.1 下载安装Redis
-前往官网下载安装Stable版本的Redis，安装后可以将安装目录添加到系统变量Path里以方便使用，我使用的是Windows系统的Redis，懒得去官网下载的可以[点这里下载](http://download.csdn.net/download/lewky_liu/10011091)。
-
-安装后，运行redis-server.exe启动服务器成功，接着运行redis-cli.exe启动客户端连接服务器成功，说明Redis已经安装成功了。
++ 前往官网下载安装Stable版本的Redis，安装后可以将安装目录添加到系统变量Path里以方便使用，我使用的是Windows系统的Redis，懒得去官网下载的可以[点这里下载](http://download.csdn.net/download/lewky_liu/10011091)。
++ 安装后，运行redis-server.exe启动服务器成功，接着运行redis-cli.exe启动客户端连接服务器成功，说明Redis已经安装成功了。
 
 >为什么使用Redis
 
-Redis属于NoSQL，即非关系型数据库，它是key-value型数据库，是直接在内存中进行存取数据的，所以有着很高的性能。
-
-利用Redis可以减轻MySQL服务器的压力，减少了跟数据库服务器的通信次数。秒杀的瓶颈就在于跟数据库服务器的通信速度（MySQL本身的主键查询非常快）
++ Redis属于NoSQL，即非关系型数据库，它是key-value型数据库，是直接在内存中进行存取数据的，所以有着很高的性能。
++ 利用Redis可以减轻MySQL服务器的压力，减少了跟数据库服务器的通信次数。秒杀的瓶颈就在于跟数据库服务器的通信速度（MySQL本身的主键查询非常快）
 
 ### 2.2 在pom.xml中配置Redis客户端
     <!--添加Redis依赖 -->
@@ -923,7 +857,6 @@ Redis属于NoSQL，即非关系型数据库，它是key-value型数据库，是�
 >Jedis
 
 + Redis有很多客户端，我们的项目是用Java语言写的，自然选择对应Java语言的客户端，而官网最推荐我们的Java客户端是Jedis，在pom.xml里配置了Jedis依赖就可以使用它了，记得要先开启Redis的服务器，Jedis才能连接到服务器。
-
 + 由于Jedis并没有实现内部序列化操作，而Java内置的序列化机制性能又不高，我们是一个秒杀系统，需要考虑高并发优化，在这里我们采用开源社区提供的更高性能的自定义序列化工具protostuff。
 
 ### 2.3 在pom.xml中配置protostuff依赖
@@ -954,7 +887,7 @@ Redis属于NoSQL，即非关系型数据库，它是key-value型数据库，是�
 
 >注意
 
-使用protostuff序列化工具时，被序列化的对象必须是pojo对象（具备setter/getter）
++ 使用protostuff序列化工具时，被序列化的对象必须是pojo对象（具备setter/getter）
 
 >在spring-dao.xml中手动注入RedisDao
 
@@ -1086,11 +1019,8 @@ public SeckillExecution executeSeckill(long seckillId, long userPhone, String md
 >为什么要先insert再update
 
 + 首先是在更新操作的时候给行加锁，插入并不会加锁，如果更新操作在前，那么就需要执行完更新和插入以后事务提交或回滚才释放锁。而如果插入在前，更新在后，那么只有在更新时才会加行锁，之后在更新完以后事务提交或回滚释放锁。
-
 + 在这里，插入是可以并行的，而更新由于会加行级锁是串行的。
-
 + 也就是说是更新在前加锁和释放锁之间两次的网络延迟和GC，如果插入在前则加锁和释放锁之间只有一次的网络延迟和GC，也就是减少的持有锁的时间。
-
 + 这里先insert并不是忽略了库存不足的情况，而是因为insert和update是在同一个事务里，光是insert并不一定会提交，只有在update成功才会提交，所以并不会造成过量插入秒杀成功记录。
 
 ### 3.2 深度优化
@@ -1101,12 +1031,9 @@ public SeckillExecution executeSeckill(long seckillId, long userPhone, String md
 
 + 根据row_count()返回值，可以进行接下来的流程判断：
 
-0：未修改数据；
-
-大于0: 表示修改的行数；
-
-小于0: 表示SQL错误或未执行修改SQL
-
+    - 0：未修改数据；
+    - 大于0: 表示修改的行数；
+    - 小于0: 表示SQL错误或未执行修改SQL
 #### 3.2.2 修改源码以调用存储过程
 
 + 在SeckillDao里添加调用存储过程的方法声明
