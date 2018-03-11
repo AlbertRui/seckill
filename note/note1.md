@@ -1,6 +1,6 @@
 ### (一)Java高并发秒杀APi之业务分析与DAO层代码编写
 #### 构建项目的基本骨架
- * 首先我们要搭建出一个符合Maven约定的目录来,这里大致有两种方式,第一种:
+* 首先我们要搭建出一个符合Maven约定的目录来,这里大致有两种方式,第一种:
 1. 第一种使用命令行手动构建一个maven结构的目录,当然我基本不会这样构建
 ```
 mvn archetype:generate -DgroupId=org.seckill -DartifactId=seckill -Dpackage=org.seckill -Dversion=1.0-SNAPSHOT -DarchetypeArtifactId=maven-archetype-webapp
@@ -11,49 +11,46 @@ mvn archetype:generate -DgroupId=org.seckill -DartifactId=seckill -Dpackage=org.
   + 点击左上角`File>New>Project>Maven`
   + 然后在里面勾选`Create from archetype`,然后再往下拉找到`org.apache.cocoon:cocoon-22-archetype-webapp`,选中它,注意要先勾选那个选项,否则选择不了,然后点击`Next`继续  
   ![创建Maven项目](../images/001.png)    
-  +然后就填写你的Maven的那几个重要的坐标了,自己看着填吧  
+  + 然后就填写你的Maven的那几个重要的坐标了,自己看着填吧  
   ![填写Maven坐标](../images/002.png)  
-  +再就配置你的Maven的相关信息,默认应该是配置好的  
+  + 再就配置你的Maven的相关信息,默认应该是配置好的  
   ![填写Maven在你本机的位置](../images/003.png)  
-  +之后就是点`Finsh`,到此不出意外的话就应该创建成功了    
+  + 之后就是点`Finsh`,到此不出意外的话就应该创建成功了    
   
 #### 构建pom文件
-  
-  项目基本的骨架我们就创建出来了,接下来我们要添加一些基本的JAR包的依赖,也就是在[pom.xml](/pom.xml)中添加各种开源组件的三坐标了    
++ 项目基本的骨架我们就创建出来了,接下来我们要添加一些基本的JAR包的依赖,也就是在[pom.xml](/pom.xml)中添加各种开源组件的三坐标了    
 #### 建立数据库
-在根目录下有一个[sql](/src/main/sql)文件夹里面存放着本项目的数据库脚本,如果你不想自己手写的话就直接导入到你的数据库里面去吧,不过还是建议自己手写一遍加深印象
-
++ 在根目录下有一个[sql](/src/main/sql)文件夹里面存放着本项目的数据库脚本,如果你不想自己手写的话就直接导入到你的数据库里面去吧,不过还是建议自己手写一遍加深印象
 + 在建立数据库的,如果按照我这里的数据库脚本建立的话应该是没问题的,但是我按照视频里面的数据库脚本建表的话发生了一个错误  
   ![sql报错](../images/sqlError.png)
- 这个报错看起来比较的诡异,我仔细检查`sql`也没有错误,它总提示我`end_time`要有一个默认的值,可我记得我以前就不会这样,然后视频里面也没有执行错误,然后我感觉可能时`MySQL`版本的差异,我查看了下我数据库版本,在登录`Mysql`控制台后输入指令,在控制台的我暂时知道的有两种方式:
- ```sql
++ 这个报错看起来比较的诡异,我仔细检查`sql`也没有错误,它总提示我`end_time`要有一个默认的值,可我记得我以前就不会这样,然后视频里面也没有执行错误,然后我感觉可能时`MySQL`版本的差异,我查看了下我数据库版本,在登录`Mysql`控制台后输入指令,在控制台的我暂时知道的有两种方式:
+```sql
 select version();  
 select @@version;
 ```
-我的输出结果如下:
++ 我的输出结果如下:
 ![Mysql版本](../images/mysqlVersion.png)
-其实登录进控制台就已经可以看到版本了,我的Mysql是`5.7`的,以前我用的时`5.6`的,然后去`Google`上搜索了下,找到了几个答案,参考链接：  
++ 其实登录进控制台就已经可以看到版本了,我的Mysql是`5.7`的,以前我用的时`5.6`的,然后去`Google`上搜索了下,找到了几个答案,参考链接：  
  - [Invalid default value for 'create_date' timestamp field](https://stackoverflow.com/questions/9192027/invalid-default-value-for-create-date-timestamp-field)  
  - [mysql官方的解释](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_no_zero_date)  
  - [MySQL Community 5.7 - Invalid default value (datetime field type)
 ](https://stackoverflow.com/questions/34570611/mysql-community-5-7-invalid-default-value-datetime-field-type)  
-总结出来一句话就是:
++ 总结出来一句话就是:
 > mysql 5.7中,默认使用的是严格模式,这里的日期必须要有时间,所以一定要给出默认值,要么就修改数据库设置  
 
-然后网友评论里总结出来的几种解决办法,未经测试！：  
- + 下次有问题一定要先看一下评论！！！create不了的同学,可以这样写：
++ 然后网友评论里总结出来的几种解决办法,未经测试！下次有问题一定要先看一下评论！！！create不了的同学,可以这样写：
  ```sql
     `start_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀开始时间',
     `end_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀结束时间',
     `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
  ```
     
-   + 关于timestamp的问题,需要先运行 set explicit_defaults_for_timestamp = 1,否则会报invalid default value错误
-   + 还需要注意的是SQL版本的问题会导致视频中seckill表创建会出错。只要将create_time放在start_time和end_time之前是方便的解决方法。  
++ 关于timestamp的问题,需要先运行 set explicit_defaults_for_timestamp = 1,否则会报invalid default value错误
++ 还需要注意的是SQL版本的问题会导致视频中seckill表创建会出错。只要将create_time放在start_time和end_time之前是方便的解决方法。  
 
- 对比下我修改过后的跟视频里面的`sql`片段:
++ 对比下我修改过后的跟视频里面的`sql`片段:
  ![sql对比](../images/sqlCompare.png)  
- 我们可以看到在这三个字段有一个小差别,那就是给`start_time`,`end_time`,`create_time`三个字段都添加一个默认值,然后执行数据库语句就没问题了
++ 我们可以看到在这三个字段有一个小差别,那就是给`start_time`,`end_time`,`create_time`三个字段都添加一个默认值,然后执行数据库语句就没问题了
  
 ---
 ####  这里我们需要修改下`web.xml`中的servlet版本为`3.0`
@@ -66,12 +63,11 @@ select @@version;
          version="3.0" metadata-complete="true">
     <!--用maven创建的web-app需要修改servlet的版本为3.0-->
 ```
-修改的原因有以下几点:  
-   * 高版本的Servlet支持更多的特性,更方便我们的Coding,特别是支持注解这一特性
-   * 在`Servlet2.3`中新加入了`Listener`接口的实现,,我们可以使用`Listener`引入`Spring`的`ContextLoaderListener`  
++ 修改的原因有以下几点:  
+    * 高版本的Servlet支持更多的特性,更方便我们的Coding,特别是支持注解这一特性
+    * 在`Servlet2.3`中新加入了`Listener`接口的实现,,我们可以使用`Listener`引入`Spring`的`ContextLoaderListener`  
 
-举个栗子:  
-  + 在`Servlet2.3`以前我们这样配置`ContextLoaderListener`:
++ 举个栗子,在`Servlet2.3`以前我们这样配置`ContextLoaderListener`:
 ```xml
 <servlet>
  <servlet-name>context</servlet-name>
@@ -79,13 +75,13 @@ select @@version;
  <load-on-startup>1</load-on-startup>
 </servlet>
 ```
- + 在`Servlet2.3`以后可以使用`Listener`配置,也就是我们项目中使用的方法
++ 在`Servlet2.3`以后可以使用`Listener`配置,也就是我们项目中使用的方法
  ````xml
 <listener>
  <listener-class>org.springframework.context.ContextLoaderListener</listener-class>
 </listener>
 ````
-两种方法的效果都是一样的,主要不要同时使用,否则会报错的  
++ 两种方法的效果都是一样的,主要不要同时使用,否则会报错的  
 
 #### 建立实体类
  - 首先建立[SuccessKilled](/src/main/java/org/seckill/entity/SuccessKilled.java)秒杀状态表
@@ -104,8 +100,8 @@ select @@version;
 - 建立`Spring`的`dao`的配置文件,在`src/main/resources/spring`包下创建[spring-dao.xml](/src/main/resources/spring/spring-dao.xml)
 
 - 基础的部分我们搭建完成了,然后要开始测试了
- 在`IDEA`里面有一个快速建立测试的快捷键`Ctrl+Shift+T`,在某个要测试的类里面按下这个快捷键就会出现`Create new Test`,然后选择你要测试的方法跟测试的工具就可以了,这里我们使用Junit作为测试
-  + 建立[SeckillDaoTest.java](/src/test/java/org/seckill/dao/SeckillDaoTest.java)文件.
++ 在`IDEA`里面有一个快速建立测试的快捷键`Ctrl+Shift+T`,在某个要测试的类里面按下这个快捷键就会出现`Create new Test`,然后选择你要测试的方法跟测试的工具就可以了,这里我们使用Junit作为测试
++ 建立[SeckillDaoTest.java](/src/test/java/org/seckill/dao/SeckillDaoTest.java)文件.
 测试中可能会出现`Mybatis`参数绑定失败的错误,在`mapper`接口中的方法里面添加`@Param`的注解,显示的告诉mybatis参数的名称是什么,例如
 ```java
 List<Seckill> queryAll(@Param("offset") int offset, @Param("limit") int limit);
