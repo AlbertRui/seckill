@@ -17,8 +17,7 @@
       
     # About IntelliJ
     *.iml
-    /.idea/
-    /out/  
+    /out/
       
     # BlueJ files  
     *.ctxt  
@@ -60,3 +59,5 @@
 /target/
 /ssmcrud.iml
 /seckill.iml
+src/test/resources/
+.idea/
